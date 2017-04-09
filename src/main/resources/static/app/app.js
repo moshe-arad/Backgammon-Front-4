@@ -8,9 +8,9 @@ backgammonApp.config(function ($routeProvider, $httpProvider) {
 	$httpProvider.interceptors.push('unauthorized401');
 	
 	$routeProvider	
-	.when("/", {controller: "HomeController", templateUrl: "/app/partials/home.html"})	
-	.when("/error", {controller: "HomeController", templateUrl: "/app/partials/error.html"})
-	.when("/lobby", {controller: "LobbyController", templateUrl: "/app/securedFolder/partials/lobby.html"});
+	.when("/", {controller: "HomeCtrl", templateUrl: "/app/partials/home.html"})	
+	.when("/error", {controller: "HomeCtrl", templateUrl: "/app/partials/error.html"})
+	.when("/lobby", {controller: "LobbyCtrl", templateUrl: "/app/partials/lobby.html"});
 });
 
 backgammonApp.factory("unauthorized401", function ($q, $location) {

@@ -4,7 +4,7 @@
 	function HomeCtrl ($rootScope, $scope, $interval, $timeout, $location, $http) {
 	
 		$scope.user = {};
-		$scope.register_error = "";
+		$scope.register_error = false;
 				
 		$scope.register = function() {
 			console.log(isPassedValidation());
