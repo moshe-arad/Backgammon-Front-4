@@ -1,5 +1,6 @@
-package org.moshe.arad;
+package org.moshe.arad.security;
 
+import org.moshe.arad.repository.BackgammonUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

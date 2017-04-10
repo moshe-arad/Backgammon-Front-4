@@ -1,4 +1,4 @@
-package org.moshe.arad;
+package org.moshe.arad.controllers;
 
 import java.security.Principal;
 

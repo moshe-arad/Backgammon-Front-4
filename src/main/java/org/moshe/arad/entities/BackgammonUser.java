@@ -1,4 +1,4 @@
-package org.moshe.arad;
+package org.moshe.arad.entities;
 
 import java.util.Collection;
 import java.util.Date;

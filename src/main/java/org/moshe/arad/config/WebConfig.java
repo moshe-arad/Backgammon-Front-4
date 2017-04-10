@@ -1,4 +1,4 @@
-package org.moshe.arad;
+package org.moshe.arad.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
