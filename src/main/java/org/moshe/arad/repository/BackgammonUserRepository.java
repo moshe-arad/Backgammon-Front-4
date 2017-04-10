@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BackgammonUserRepository extends JpaRepository<BackgammonUser,String>{
 
-	public BackgammonUser findByUserName(String UserName);
+	public BackgammonUser findByUserName(String UserName); 
 }

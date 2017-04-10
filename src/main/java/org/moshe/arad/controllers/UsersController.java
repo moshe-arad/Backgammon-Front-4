@@ -1,24 +1,16 @@
 package org.moshe.arad.controllers;
 
-import java.security.Principal;
-
 import javax.validation.Valid;
 
-import org.moshe.arad.entities.BasicUser;
-import org.moshe.arad.entities.GameUser;
-import org.moshe.arad.jackson.entities.JsonAccessToken;
-import org.moshe.arad.jackson.entities.JsonBasicUser;
+import org.moshe.arad.entities.BackgammonUser;
 import org.moshe.arad.services.HomeService;
-import org.moshe.arad.services.rest.OAuth2RestService;
-import org.moshe.arad.services.rest.UsersDataRestService;
-import org.moshe.arad.validators.GameUserValidator;
+import org.moshe.arad.validators.BackgammonUserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
@@ -29,13 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @RestController
 @RequestMapping(value = "/users")
 public class UsersController {
 	
 	private final Logger logger = LoggerFactory.getLogger(UsersController.class);
+	
+	@Autowired
+	private HomeService homeService;
 	
 //	@RequestMapping(value = "", method = RequestMethod.GET)
 //	public ResponseEntity<BasicUser> isUserAuthenticated(Principal user){
@@ -55,9 +48,9 @@ public class UsersController {
 //	}
 	
 	@RequestMapping(value = "/", method = RequestMethod.POST)
-	public ResponseEntity<String> createNewUser(@Valid @RequestBody GameUser gameUser, Errors errors){
+	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUser backgammonUser, Errors errors){
 		if(errors.hasErrors()){
-			logger.info("Some errors occured while trying to bind game user");
+			logger.info("Some errors occured while trying to bind backgammon user");
 			logger.info("There are " + errors.getErrorCount() + " errors.");
 			
 			for(FieldError error:errors.getFieldErrors()){
@@ -65,7 +58,7 @@ public class UsersController {
 				logger.warn(error.getDefaultMessage());
 			}
 			
-			if(!GameUserValidator.acceptableErrors(errors)){
+			if(!BackgammonUserValidator.acceptableErrors(errors)){
 				logger.info("Routing for home page.");
 				HttpHeaders header = new HttpHeaders();
 				header.add("Content-Type", "application/json");
@@ -73,42 +66,44 @@ public class UsersController {
 			}
 		}
 		
-		logger.info("The GameUser bind result: " + gameUser);
+		logger.info("The GameUser bind result: " + backgammonUser);
 		
-		try{
-			if(homeService.registerNewUser(gameUser)){
-				String code = oauth2RestService.getAuthorizationCode(gameUser);
-				
-				if(!StringUtils.isEmpty(code)){
-					JsonAccessToken token = oauth2RestService.getAccessToken(code, gameUser);	
-					JsonBasicUser jsonBasicUser = usersDataRestService.findBasicUser(gameUser);
-				
-					if(jsonBasicUser != null && usersDataRestService.saveAccessToken(jsonBasicUser, token)){
-							HttpHeaders header = new HttpHeaders();
-							header.add("Content-Type", "application/json");
-							ObjectMapper mapper = new ObjectMapper();
-							BasicUser basicUser = new BasicUser(gameUser.getBasicUser().getUserName(), 
-									gameUser.getBasicUser().getPassword(), gameUser.getBasicUser().getEnabled());
-							
-							return new ResponseEntity<String>(mapper.writeValueAsString(basicUser), header, HttpStatus.CREATED);
-					}	
-				}
-			}
-			
-			logger.info("Failed to add and create new user.");
-			HttpHeaders header = new HttpHeaders();
-			header.add("Content-Type", "application/json");
-			return new ResponseEntity<String>(header, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		catch(Exception ex){
-			logger.info("User register failed.");
-			logger.info("Routing for home page.");
-			logger.error(ex.getMessage());
-			logger.error(ex.toString());
-			HttpHeaders header = new HttpHeaders();
-			header.add("Content-Type", "application/json");
-			return new ResponseEntity<String>(header, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return null;
+		
+//		try{
+//			if(homeService.registerNewUser(gameUser)){
+//				String code = oauth2RestService.getAuthorizationCode(gameUser);
+//				
+//				if(!StringUtils.isEmpty(code)){
+//					JsonAccessToken token = oauth2RestService.getAccessToken(code, gameUser);	
+//					JsonBasicUser jsonBasicUser = usersDataRestService.findBasicUser(gameUser);
+//				
+//					if(jsonBasicUser != null && usersDataRestService.saveAccessToken(jsonBasicUser, token)){
+//							HttpHeaders header = new HttpHeaders();
+//							header.add("Content-Type", "application/json");
+//							ObjectMapper mapper = new ObjectMapper();
+//							BasicUser basicUser = new BasicUser(gameUser.getBasicUser().getUserName(), 
+//									gameUser.getBasicUser().getPassword(), gameUser.getBasicUser().getEnabled());
+//							
+//							return new ResponseEntity<String>(mapper.writeValueAsString(basicUser), header, HttpStatus.CREATED);
+//					}	
+//				}
+//			}
+//			
+//			logger.info("Failed to add and create new user.");
+//			HttpHeaders header = new HttpHeaders();
+//			header.add("Content-Type", "application/json");
+//			return new ResponseEntity<String>(header, HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//		catch(Exception ex){
+//			logger.info("User register failed.");
+//			logger.info("Routing for home page.");
+//			logger.error(ex.getMessage());
+//			logger.error(ex.toString());
+//			HttpHeaders header = new HttpHeaders();
+//			header.add("Content-Type", "application/json");
+//			return new ResponseEntity<String>(header, HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
 	}
 	
 	@RequestMapping(value = "/user_name/{userName}", method = RequestMethod.GET)
@@ -164,8 +159,8 @@ public class UsersController {
 		}
 	}
 	
-	@InitBinder("gameUser")
+	@InitBinder
 	public void initBinder(WebDataBinder binder){
-		binder.addValidators(new GameUserValidator());
+		binder.addValidators(new BackgammonUserValidator());
 	}
 }
