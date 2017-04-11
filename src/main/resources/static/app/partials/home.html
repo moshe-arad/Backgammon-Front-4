@@ -59,7 +59,7 @@
 					<label for="userName">User Name:</label>
 					<input type="text" class="form-control" id="userName" 
 						placeholder="User Name" name="basicUser.userName"
-						ng-model="user.basicUser.userName"
+						ng-model="user.userName"
 						ng-change="onUserNameInsert(user)">
 				</div>
 				
@@ -69,7 +69,7 @@
 					<label for="password">Password:</label>
 					<input type="password" class="form-control" id="password" 
 						placeholder="Password" name="basicUser.password"
-						ng-model="user.basicUser.password" 
+						ng-model="user.password" 
 						
 						ng-focus="onCheckValidPassword(user)"
 						ng-keyup="onCheckValidPassword(user)"

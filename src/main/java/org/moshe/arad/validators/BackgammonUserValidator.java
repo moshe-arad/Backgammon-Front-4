@@ -22,7 +22,7 @@ public class BackgammonUserValidator implements Validator, EntityValidator {
 	
 	public static boolean acceptableErrors(Errors errors) {
 		for(FieldError error:errors.getFieldErrors()){
-			if(!ignore.contains(error.getField())){
+			if(!error.getField().equals("enabled") && !ignore.contains(error.getField())){
 				logger.info("This error couldn't be ignore " + error);
 				return false;
 			}

@@ -5,8 +5,12 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Email;
@@ -15,20 +19,20 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name="users")
+@EntityListeners(AuditingEntityListener.class)
 public class BackgammonUser implements UserDetails{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private Long userId;
+	
 	@Column(name="username")
 	@NotBlank
 	private String userName;
@@ -36,45 +40,65 @@ public class BackgammonUser implements UserDetails{
 	@NotBlank
 	private String password;
 	
-	@NotBlank
+	@NotNull
 	private Boolean enabled;
 	
 	@NotBlank
 	@Pattern(regexp = "[A-Z|a-z| \\-]+")
+	@Column(name="first_name")
 	private String firstName;
 	
 	@NotBlank
 	@Pattern(regexp = "[A-Z|a-z| \\-]+")
+	@Column(name="last_name")
 	private String lastName;
 	
 	@Email
 	private String email;
 
 	@Column(name="last_modified_date")
-	@NotBlank
+	@NotNull
 	@LastModifiedDate
 	private Date lastModifiedDate;
 	
 	@Column(name="last_modified_by")
-	@NotBlank
+	@NotNull
 	@LastModifiedBy
 	private String lastModifiedBy;
 	
 	@Column(name="created_date")
-	@NotBlank
+	@NotNull
 	@CreatedDate
-	private Date createDate;
+	private Date createdDate;
 	
 	@Column(name="created_by")
-	@NotBlank
+	@NotNull
 	@CreatedBy
 	private String createdBy;
+
+	public BackgammonUser() {
+	}
+	
+	public BackgammonUser(String userName, String password, Boolean enabled, String firstName, String lastName,
+			String email, Date lastModifiedDate, String lastModifiedBy, Date createdDate, String createdBy) {
+		super();
+		this.userName = userName;
+		this.password = password;
+		this.enabled = enabled;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.lastModifiedDate = lastModifiedDate;
+		this.lastModifiedBy = lastModifiedBy;
+		this.createdDate = createdDate;
+		this.createdBy = createdBy;
+	}
 
 	@Override
 	public String toString() {
 		return "BackgammonUser [userName=" + userName + ", password=" + password + ", enabled=" + enabled
 				+ ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email + ", lastModifiedDate="
-				+ lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy + ", createDate=" + createDate
+				+ lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy + ", createDate=" + createdDate
 				+ ", createdBy=" + createdBy + "]";
 	}
 
@@ -142,12 +166,12 @@ public class BackgammonUser implements UserDetails{
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
-	public Date getCreateDate() {
-		return createDate;
+	public Date getCreatedDate() {
+		return createdDate;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
+	public void setCreatedDate(Date createDate) {
+		this.createdDate = createDate;
 	}
 
 	public String getCreatedBy() {

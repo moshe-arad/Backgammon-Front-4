@@ -37,8 +37,8 @@
 			var lastName = isValidName($scope.user.lastName);
 			var email = checkValidEmail();
 	
-			var password = isValidPassword($scope.user.basicUser.password) == "valid" ? true:false;
-			var passwordMatch = $scope.user.confirm == $scope.user.basicUser.password ? true:false; 
+			var password = isValidPassword($scope.user.password) == "valid" ? true:false;
+			var passwordMatch = $scope.user.confirm == $scope.user.password ? true:false; 
 			
 			if(!Boolean(firstName)) return "First name didn't passed validation";
 			if(!Boolean(lastName)) return "Last name didn't passed validation";
@@ -101,12 +101,12 @@
 		/***** user name *****/
 		
 		function checkUserNameAvailable(user){		
-			if(typeof user.basicUser.userName != "undefined" && user.basicUser.userName.length >=3)
+			if(typeof user.userName != "undefined" && user.userName.length >=3)
 			{
-				console.log(user.basicUser.userName);
+				console.log(user.userName);
 				
 				$timeout(function(){
-					checkAvailable("http://localhost:8080/users/user_name/" + $scope.user.basicUser.userName + "/")
+					checkAvailable("http://localhost:8080/users/user_name/" + $scope.user.userName + "/")
 					}, 1000, false);
 			}
 				
@@ -153,8 +153,8 @@
 		function checkValidPassword(user){
 			
 			$interval(function(){
-				if(typeof user.basicUser.password != "undefined"){
-					var result = isValidPassword(user.basicUser.password);
+				if(typeof user.password != "undefined"){
+					var result = isValidPassword(user.password);
 					if(result != "valid") {
 						angular.element("#invalidPassword").html(result);
 						angular.element("#invalidPassword").removeClass("hidden")
@@ -211,8 +211,8 @@
 			
 			console.log(user.confirm);
 			$interval(function(){
-				if(angular.isDefined(user.confirm) && angular.isDefined(user.basicUser.password)){					
-					if(user.confirm != user.basicUser.password){
+				if(angular.isDefined(user.confirm) && angular.isDefined(user.password)){					
+					if(user.confirm != user.password){
 						angular.element("#invalidConfirmPassword").html("Passwords does not match.");
 						angular.element("#invalidConfirmPassword").removeClass("hidden");						
 					}

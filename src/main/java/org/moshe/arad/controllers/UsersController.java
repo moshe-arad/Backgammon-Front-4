@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RestController
 @RequestMapping(value = "/users")
 public class UsersController {
@@ -68,42 +70,23 @@ public class UsersController {
 		
 		logger.info("The GameUser bind result: " + backgammonUser);
 		
-		return null;
-		
-//		try{
-//			if(homeService.registerNewUser(gameUser)){
-//				String code = oauth2RestService.getAuthorizationCode(gameUser);
-//				
-//				if(!StringUtils.isEmpty(code)){
-//					JsonAccessToken token = oauth2RestService.getAccessToken(code, gameUser);	
-//					JsonBasicUser jsonBasicUser = usersDataRestService.findBasicUser(gameUser);
-//				
-//					if(jsonBasicUser != null && usersDataRestService.saveAccessToken(jsonBasicUser, token)){
-//							HttpHeaders header = new HttpHeaders();
-//							header.add("Content-Type", "application/json");
-//							ObjectMapper mapper = new ObjectMapper();
-//							BasicUser basicUser = new BasicUser(gameUser.getBasicUser().getUserName(), 
-//									gameUser.getBasicUser().getPassword(), gameUser.getBasicUser().getEnabled());
-//							
-//							return new ResponseEntity<String>(mapper.writeValueAsString(basicUser), header, HttpStatus.CREATED);
-//					}	
-//				}
-//			}
-//			
-//			logger.info("Failed to add and create new user.");
-//			HttpHeaders header = new HttpHeaders();
-//			header.add("Content-Type", "application/json");
-//			return new ResponseEntity<String>(header, HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//		catch(Exception ex){
-//			logger.info("User register failed.");
-//			logger.info("Routing for home page.");
-//			logger.error(ex.getMessage());
-//			logger.error(ex.toString());
-//			HttpHeaders header = new HttpHeaders();
-//			header.add("Content-Type", "application/json");
-//			return new ResponseEntity<String>(header, HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
+		try{
+			homeService.registerNewUser(backgammonUser);
+			
+			HttpHeaders header = new HttpHeaders();
+			header.add("Content-Type", "application/json");
+			ObjectMapper mapper = new ObjectMapper();
+			return new ResponseEntity<String>(mapper.writeValueAsString(backgammonUser), header, HttpStatus.CREATED);
+		}
+		catch(Exception ex){
+			logger.info("User register failed.");
+			logger.info("Routing for home page.");
+			logger.error(ex.getMessage());
+			logger.error(ex.toString());
+			HttpHeaders header = new HttpHeaders();
+			header.add("Content-Type", "application/json");
+			return new ResponseEntity<String>(header, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value = "/user_name/{userName}", method = RequestMethod.GET)
