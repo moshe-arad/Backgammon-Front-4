@@ -3,6 +3,8 @@ package org.moshe.arad.controllers;
 import javax.validation.Valid;
 
 import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.kafka.commands.CreateNewUserCommand;
+import org.moshe.arad.kafka.producers.SimpleProducer;
 import org.moshe.arad.services.HomeService;
 import org.moshe.arad.validators.BackgammonUserValidator;
 import org.slf4j.Logger;
@@ -31,6 +33,9 @@ public class UsersController {
 	
 	@Autowired
 	private HomeService homeService;
+	
+	@Autowired
+	private SimpleProducer<CreateNewUserCommand> simpleProducer;
 	
 //	@RequestMapping(value = "", method = RequestMethod.GET)
 //	public ResponseEntity<BasicUser> isUserAuthenticated(Principal user){
@@ -71,7 +76,10 @@ public class UsersController {
 		logger.info("The GameUser bind result: " + backgammonUser);
 		
 		try{
-			homeService.registerNewUser(backgammonUser);
+//			homeService.registerNewUser(backgammonUser);
+			
+			CreateNewUserCommand createNewUserCommand = new CreateNewUserCommand(backgammonUser);
+			simpleProducer.sendKafkaMessage("Commands-To-Users-Service", createNewUserCommand);
 			
 			HttpHeaders header = new HttpHeaders();
 			header.add("Content-Type", "application/json");
