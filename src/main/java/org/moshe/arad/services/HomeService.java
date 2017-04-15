@@ -25,10 +25,11 @@ public class HomeService {
 	public void registerNewUser(BackgammonUser backgammonUser) {
 		
 		if(!isEmailAvailable(backgammonUser.getEmail()) || !isUserNameAvailable(backgammonUser.getUsername())) throw new RuntimeException("Email or user name is already taken.");
-		
+		logger.info("User's email and user name are available.");
 		backgammonUser.setEnabled(true);
 		backgammonUserRepository.save(backgammonUser);
 		authenticateUser(backgammonUser);
+		logger.info("User saved to local DB, and authenticated.");
 	}	
 	
 	public boolean isUserNameAvailable(String userName){		

@@ -15,8 +15,7 @@ public class BackgammonUserDetailsService implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-		return backgammonUserRepository.findByUserName(userName);
-		
+		return backgammonUserRepository.findByUserName(userName);		
 	}
 		
 }

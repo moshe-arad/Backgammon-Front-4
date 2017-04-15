@@ -9,7 +9,7 @@ import org.moshe.arad.kafka.commands.CreateNewUserCommand;
 
 public class CreateNewUserCommandSerializer implements Serializer<CreateNewUserCommand>{
 
-	private String encoding = "UTF8";
+	private static final String encoding = "UTF8";
 	
 	@Override
 	public void close() {
@@ -26,7 +26,6 @@ public class CreateNewUserCommandSerializer implements Serializer<CreateNewUserC
 	@Override
 	public byte[] serialize(String paramString, CreateNewUserCommand command) {
 
-//		Long userId;
 		byte[] serializedUserName;
 		int sizeOfUserName;		
 		byte[] serializedPassword;
@@ -56,23 +55,24 @@ public class CreateNewUserCommandSerializer implements Serializer<CreateNewUserC
 			 sizeOfLastName = command.getBackgammonUser().getLastName().length();
 			 
 			 serializedEmail = command.getBackgammonUser().getEmail().getBytes(encoding);
-			 sizeOfEmail = command.getBackgammonUser().getEmail().length();
-			 
-//           ByteBuffer buf = ByteBuffer.allocate(8+4+sizeOfUserName+4+sizeOfPassword+4+sizeOfFirstName+4+sizeOfLastName+4+sizeOfEmail);
+			 sizeOfEmail = command.getBackgammonUser().getEmail().length();	
 			 
 			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserName+4+sizeOfPassword+4+sizeOfFirstName+4+sizeOfLastName+4+sizeOfEmail+4);
-             buf.put(serializedUserName);        
-             buf.putInt(sizeOfUserName);
+			 buf.putInt(sizeOfUserName);
+			 buf.put(serializedUserName);        
+            
+			 buf.putInt(sizeOfPassword);
              buf.put(serializedPassword);
-             buf.putInt(sizeOfPassword);
-             buf.put(serializedFirstName);        
+             
              buf.putInt(sizeOfFirstName);
-             buf.put(serializedLastName);
+             buf.put(serializedFirstName);        
+             
              buf.putInt(sizeOfLastName);
-             buf.put(serializedEmail);
+             buf.put(serializedLastName);
+             
              buf.putInt(sizeOfEmail);
-
-
+             buf.put(serializedEmail);
+             
 	         return buf.array();
 
 	        } catch (Exception e) {

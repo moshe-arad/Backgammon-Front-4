@@ -37,23 +37,6 @@ public class UsersController {
 	@Autowired
 	private SimpleProducer<CreateNewUserCommand> simpleProducer;
 	
-//	@RequestMapping(value = "", method = RequestMethod.GET)
-//	public ResponseEntity<BasicUser> isUserAuthenticated(Principal user){
-//		BasicUser result = new BasicUser();
-//		
-//		if(user != null){
-//			logger.info("User how made this request is currently logged in.");
-//			result.setUserName(homeService.getUserNameOfLoggedUser());
-//			HttpHeaders header = new HttpHeaders();
-//			header.add("Content-Type", "text/html");
-//			return new ResponseEntity<BasicUser>(result, header, HttpStatus.OK);
-//		}
-//		else{
-//			logger.info("User how made this request is not logged in.");
-//			return new ResponseEntity<BasicUser>(HttpStatus.NO_CONTENT);
-//		}
-//	}
-	
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUser backgammonUser, Errors errors){
 		if(errors.hasErrors()){
@@ -76,7 +59,7 @@ public class UsersController {
 		logger.info("The GameUser bind result: " + backgammonUser);
 		
 		try{
-//			homeService.registerNewUser(backgammonUser);
+			homeService.registerNewUser(backgammonUser);
 			
 			CreateNewUserCommand createNewUserCommand = new CreateNewUserCommand(backgammonUser);
 			simpleProducer.sendKafkaMessage("Commands-To-Users-Service", createNewUserCommand);

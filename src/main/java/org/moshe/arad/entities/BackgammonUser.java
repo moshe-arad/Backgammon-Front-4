@@ -32,6 +32,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 @EntityListeners(AuditingEntityListener.class)
 public class BackgammonUser implements UserDetails{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long userId;
