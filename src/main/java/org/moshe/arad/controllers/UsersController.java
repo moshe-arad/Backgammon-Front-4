@@ -3,6 +3,7 @@ package org.moshe.arad.controllers;
 import javax.validation.Valid;
 
 import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
 import org.moshe.arad.kafka.producers.SimpleProducer;
 import org.moshe.arad.services.HomeService;
@@ -62,7 +63,7 @@ public class UsersController {
 			homeService.registerNewUser(backgammonUser);
 			
 			CreateNewUserCommand createNewUserCommand = new CreateNewUserCommand(backgammonUser);
-			simpleProducer.sendKafkaMessage("Commands-To-Users-Service", createNewUserCommand);
+			simpleProducer.sendKafkaMessage(KafkaUtils.COMMANDS_TO_USERS_SERVICE_TOPIC, createNewUserCommand);
 			
 			HttpHeaders header = new HttpHeaders();
 			header.add("Content-Type", "application/json");
