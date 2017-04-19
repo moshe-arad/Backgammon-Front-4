@@ -1,8 +1,10 @@
 package org.moshe.arad.kafka.commands;
 
 import org.moshe.arad.entities.BackgammonUser;
+import org.springframework.stereotype.Component;
 
-public class CreateNewUserCommand {
+@Component
+public class CreateNewUserCommand implements Commandable{
 
 	private BackgammonUser backgammonUser;
 	
@@ -12,6 +14,11 @@ public class CreateNewUserCommand {
 	public CreateNewUserCommand(BackgammonUser backgammonUser) {
 		super();
 		this.backgammonUser = backgammonUser;
+	}
+	
+	@Override
+	public String toString() {
+		return "CreateNewUserCommand [backgammonUser=" + backgammonUser + "]";
 	}
 
 	public BackgammonUser getBackgammonUser() {

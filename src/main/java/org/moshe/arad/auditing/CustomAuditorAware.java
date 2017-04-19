@@ -9,8 +9,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class CustomAuditorAware implements AuditorAware<String> {
 
 	private static final String DEFAULT_AUDITOR = "System";
+	
 	@Autowired
-	BackgammonUserRepository backgammonUserRepository;
+	private BackgammonUserRepository backgammonUserRepository;
 	
 	@Override
 	public String getCurrentAuditor() {

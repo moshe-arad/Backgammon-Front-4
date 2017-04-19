@@ -30,13 +30,6 @@ public class CreateNewUserCommandSerializer implements Serializer<CreateNewUserC
 		int sizeOfUserName;		
 		byte[] serializedPassword;
 		int sizeOfPassword;
-		byte[] serializedFirstName;
-		int sizeOfFirstName;
-		byte[] serializedLastName;
-		int sizeOfLastName;
-		byte[] serializedEmail;
-		int sizeOfEmail;
-		
 		
 		 try {
 			 if (command == null)
@@ -48,30 +41,12 @@ public class CreateNewUserCommandSerializer implements Serializer<CreateNewUserC
 			 serializedPassword = command.getBackgammonUser().getPassword().getBytes(encoding);
 			 sizeOfPassword = command.getBackgammonUser().getPassword().length();
 			 
-			 serializedFirstName = command.getBackgammonUser().getFirstName().getBytes(encoding);
-			 sizeOfFirstName = command.getBackgammonUser().getFirstName().length();
-			 
-			 serializedLastName = command.getBackgammonUser().getLastName().getBytes(encoding);
-			 sizeOfLastName = command.getBackgammonUser().getLastName().length();
-			 
-			 serializedEmail = command.getBackgammonUser().getEmail().getBytes(encoding);
-			 sizeOfEmail = command.getBackgammonUser().getEmail().length();	
-			 
-			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserName+4+sizeOfPassword+4+sizeOfFirstName+4+sizeOfLastName+4+sizeOfEmail+4);
+			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserName+4+sizeOfPassword+4);
 			 buf.putInt(sizeOfUserName);
 			 buf.put(serializedUserName);        
             
 			 buf.putInt(sizeOfPassword);
-             buf.put(serializedPassword);
-             
-             buf.putInt(sizeOfFirstName);
-             buf.put(serializedFirstName);        
-             
-             buf.putInt(sizeOfLastName);
-             buf.put(serializedLastName);
-             
-             buf.putInt(sizeOfEmail);
-             buf.put(serializedEmail);
+             buf.put(serializedPassword);                    
              
 	         return buf.array();
 

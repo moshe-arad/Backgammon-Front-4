@@ -4,13 +4,18 @@ import javax.validation.Valid;
 
 import org.moshe.arad.entities.BackgammonUser;
 import org.moshe.arad.kafka.KafkaUtils;
+import org.moshe.arad.kafka.commands.Commandable;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
+import org.moshe.arad.kafka.producers.CreateNewUserCommandProducer;
 import org.moshe.arad.kafka.producers.SimpleProducer;
 import org.moshe.arad.services.HomeService;
 import org.moshe.arad.validators.BackgammonUserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,15 +33,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping(value = "/users")
-public class UsersController {
+public class UsersController implements ApplicationContextAware{
 	
 	private final Logger logger = LoggerFactory.getLogger(UsersController.class);
+	
+	private ApplicationContext context;
 	
 	@Autowired
 	private HomeService homeService;
 	
-	@Autowired
-	private SimpleProducer<CreateNewUserCommand> simpleProducer;
+	private SimpleProducer simpleProducer;
+	
+	private Commandable command;
 	
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUser backgammonUser, Errors errors){
@@ -62,8 +70,11 @@ public class UsersController {
 		try{
 			homeService.registerNewUser(backgammonUser);
 			
-			CreateNewUserCommand createNewUserCommand = new CreateNewUserCommand(backgammonUser);
-			simpleProducer.sendKafkaMessage(KafkaUtils.COMMANDS_TO_USERS_SERVICE_TOPIC, createNewUserCommand);
+			command = context.getBean(CreateNewUserCommand.class);
+			((CreateNewUserCommand)command).setBackgammonUser(backgammonUser);
+			
+			simpleProducer = context.getBean(CreateNewUserCommandProducer.class);
+			simpleProducer.sendKafkaMessage(KafkaUtils.COMMANDS_TO_USERS_SERVICE_TOPIC, command);
 			
 			HttpHeaders header = new HttpHeaders();
 			header.add("Content-Type", "application/json");
@@ -137,5 +148,10 @@ public class UsersController {
 	@InitBinder
 	public void initBinder(WebDataBinder binder){
 		binder.addValidators(new BackgammonUserValidator());
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext appContext) throws BeansException {
+		this.context = appContext;
 	}
 }
