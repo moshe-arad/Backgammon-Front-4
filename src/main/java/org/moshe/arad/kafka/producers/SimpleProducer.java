@@ -2,7 +2,7 @@ package org.moshe.arad.kafka.producers;
 
 import org.moshe.arad.kafka.commands.Commandable;
 
-public interface SimpleProducer {
+public interface SimpleProducer <T extends Commandable>{
 
-	public void sendKafkaMessage(String topicName, Commandable command);
+	public void sendKafkaMessage(T command);
 }

@@ -8,6 +8,9 @@ public class KafkaUtils {
 	public static final String KEY_STRING_SERIALIZER = "org.apache.kafka.common.serialization.StringSerializer";
 	public static final String CREATE_NEW_USER_COMMAND_DESERIALIZER = "org.moshe.arad.kafka.deserializers.CreateNewUserCommandDeserializer";
 	public static final String NEW_USER_CREATED_EVENT_SERIALIZER = "org.moshe.arad.kafka.serializers.NewUserCreatedEventSerializer";
-	public static final String COMMANDS_TO_USERS_SERVICE_TOPIC = "Commands-To-Users-Service";
+	public static final String CREATE_NEW_USER_COMMAND_TOPIC = "Create-New-User-Command";
+	public static final String CHECK_USER_EMAIL_AVAILABILITY_COMMANDS_TOPIC = "Check-User-Email-Availability-Command";
+	public static final String CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC = "Check-User-Name-Availability-Command";
 	public static final String CREATE_NEW_USER_COMMAND_SERIALIZER = "org.moshe.arad.kafka.serializers.CreateNewUserCommandSerializer";
+	public static final String CHECK_USER_NAME_AVAILABILITY_COMMAND_SERIALIZER = "org.moshe.arad.kafka.serializers.CheckUserNameAvailabilityCommandSerializer";
 }

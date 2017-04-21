@@ -49,7 +49,6 @@ public class CreateNewUserCommandSerializer implements Serializer<CreateNewUserC
              buf.put(serializedPassword);                    
              
 	         return buf.array();
-
 	        } catch (Exception e) {
 	            throw new SerializationException("Error when serializing CreateNewUserCommand to byte[]");
 	        }

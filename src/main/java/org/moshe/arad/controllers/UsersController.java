@@ -3,22 +3,17 @@ package org.moshe.arad.controllers;
 import javax.validation.Valid;
 
 import org.moshe.arad.entities.BackgammonUser;
-import org.moshe.arad.kafka.KafkaUtils;
-import org.moshe.arad.kafka.commands.Commandable;
-import org.moshe.arad.kafka.commands.CreateNewUserCommand;
-import org.moshe.arad.kafka.producers.CreateNewUserCommandProducer;
-import org.moshe.arad.kafka.producers.SimpleProducer;
 import org.moshe.arad.services.HomeService;
 import org.moshe.arad.validators.BackgammonUserValidator;
+import org.moshe.arad.websocket.UserNameMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
@@ -32,21 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-@RequestMapping(value = "/users")
-public class UsersController implements ApplicationContextAware{
+public class UsersController {
 	
 	private final Logger logger = LoggerFactory.getLogger(UsersController.class);
-	
-	private ApplicationContext context;
 	
 	@Autowired
 	private HomeService homeService;
 	
-	private SimpleProducer simpleProducer;
-	
-	private Commandable command;
-	
-	@RequestMapping(value = "/", method = RequestMethod.POST)
+	@RequestMapping(value = "/users/", method = RequestMethod.POST)
 	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUser backgammonUser, Errors errors){
 		if(errors.hasErrors()){
 			logger.info("Some errors occured while trying to bind backgammon user");
@@ -68,13 +56,9 @@ public class UsersController implements ApplicationContextAware{
 		logger.info("The GameUser bind result: " + backgammonUser);
 		
 		try{
-			homeService.registerNewUser(backgammonUser);
+//			homeService.registerNewUser(backgammonUser);
 			
-			command = context.getBean(CreateNewUserCommand.class);
-			((CreateNewUserCommand)command).setBackgammonUser(backgammonUser);
-			
-			simpleProducer = context.getBean(CreateNewUserCommandProducer.class);
-			simpleProducer.sendKafkaMessage(KafkaUtils.COMMANDS_TO_USERS_SERVICE_TOPIC, command);
+			homeService.createNewUser(backgammonUser);
 			
 			HttpHeaders header = new HttpHeaders();
 			header.add("Content-Type", "application/json");
@@ -92,11 +76,13 @@ public class UsersController implements ApplicationContextAware{
 		}
 	}
 	
-	@RequestMapping(value = "/user_name/{userName}", method = RequestMethod.GET)
-	public ResponseEntity<String> isUserNameAvailable(@PathVariable String userName){
+//	@RequestMapping(value = "/users/user_name/{userName}", method = RequestMethod.GET)
+	@MessageMapping("/users/user_name/")
+	@SendTo("/frontEndPoint/user_name")
+	public ResponseEntity<String> isUserNameAvailable(UserNameMessage userNameMessage){
 		try{
-			logger.info("User name bind result: " + userName);
-			if(homeService.isUserNameAvailable(userName)){
+			logger.info("User name bind result: " + userNameMessage);
+			if(homeService.isUserNameAvailable(userNameMessage)){
 				logger.info("User name available for registeration.");
 				HttpHeaders headers = new HttpHeaders();
 				headers.add("Content-Type", "text/html");
@@ -119,7 +105,7 @@ public class UsersController implements ApplicationContextAware{
 		}
 	}
 	
-	@RequestMapping(value = "/email/{email}/", method = RequestMethod.GET)
+	@RequestMapping(value = "/users/email/{email}/", method = RequestMethod.GET)
 	public ResponseEntity<String> isUserEmailAvailable(@PathVariable String email){
 		try{
 			logger.info("Email bind result: " + email);
@@ -148,10 +134,5 @@ public class UsersController implements ApplicationContextAware{
 	@InitBinder
 	public void initBinder(WebDataBinder binder){
 		binder.addValidators(new BackgammonUserValidator());
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext appContext) throws BeansException {
-		this.context = appContext;
 	}
 }
