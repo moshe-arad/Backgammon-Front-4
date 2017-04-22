@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.moshe.arad.entities.BackgammonUser;
 import org.moshe.arad.services.HomeService;
 import org.moshe.arad.validators.BackgammonUserValidator;
+import org.moshe.arad.websocket.UserNameAvailabilityMessage;
 import org.moshe.arad.websocket.UserNameMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,32 +77,22 @@ public class UsersController {
 		}
 	}
 	
-//	@RequestMapping(value = "/users/user_name/{userName}", method = RequestMethod.GET)
 	@MessageMapping("/users/user_name/")
 	@SendTo("/frontEndPoint/user_name")
-	public ResponseEntity<String> isUserNameAvailable(UserNameMessage userNameMessage){
+	public UserNameAvailabilityMessage isUserNameAvailable(UserNameMessage userNameMessage){
+		boolean isAvailable = false;
+		
 		try{
 			logger.info("User name bind result: " + userNameMessage);
-			if(homeService.isUserNameAvailable(userNameMessage)){
-				logger.info("User name available for registeration.");
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "text/html");
-				return new ResponseEntity<String>("", headers,HttpStatus.OK);
-				
-			}
-			else {
-				logger.info("User name not available can't register.");
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "text/html");
-				return new ResponseEntity<String>("User name is not available.", headers,HttpStatus.OK);
-			}
+			isAvailable = homeService.isUserNameAvailable(userNameMessage);
+			if(isAvailable) logger.info("User name available for registeration.");
+			else logger.info("User name not available can't register."); 				
+			return new UserNameAvailabilityMessage(isAvailable);
 		}
 		catch (Exception ex) {
 			logger.error(ex.getMessage());
 			logger.error(ex.toString());
-			HttpHeaders headers = new HttpHeaders();
-			headers.add("Content-Type", "text/html");
-			return new ResponseEntity<String>("Ajax call encountred a server error.", headers,HttpStatus.INTERNAL_SERVER_ERROR);
+			return new UserNameAvailabilityMessage(false);
 		}
 	}
 	

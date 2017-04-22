@@ -33,6 +33,9 @@ public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent>
 	private String topic;
 	private SimpleConsumerConfig simpleConsumerConfig;
 	
+	public SimpleBackgammonEventsConsumer() {
+	}
+	
 	public SimpleBackgammonEventsConsumer(SimpleConsumerConfig simpleConsumerConfig, String topic) {
 		this.simpleConsumerConfig = simpleConsumerConfig;
 		consumer = new KafkaConsumer<String,T>(simpleConsumerConfig.getProperties());
@@ -65,6 +68,10 @@ public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent>
 		        
 			} , 0, 100, TimeUnit.MILLISECONDS);
 		}
+	}
+	
+	public void initConsumer() {
+		consumer = new KafkaConsumer<String,T>(simpleConsumerConfig.getProperties());
 	}
 	
 	public abstract void consumerOperations(ConsumerRecord<String,T> record);
@@ -100,5 +107,5 @@ public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent>
 
 	public void setSimpleConsumerConfig(SimpleConsumerConfig simpleConsumerConfig) {
 		this.simpleConsumerConfig = simpleConsumerConfig;
-	}
+	}	
 }

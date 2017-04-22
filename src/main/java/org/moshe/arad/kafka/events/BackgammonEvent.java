@@ -114,11 +114,11 @@ public abstract class BackgammonEvent {
 		this.departed = departed;
 	}
 
-	protected UUID getUuid() {
+	public UUID getUuid() {
 		return uuid;
 	}
 
-	protected void setUuid(UUID uuid) {
+	public void setUuid(UUID uuid) {
 		this.uuid = uuid;
 	}
 }

@@ -9,7 +9,10 @@ public class CheckUserEmailAvailabilityCommand implements Commandable {
 
 	private UUID uuid;
 	private String email;
-
+ 
+	public CheckUserEmailAvailabilityCommand() {
+	}
+	
 	public CheckUserEmailAvailabilityCommand(UUID uuid, String email) {
 		this.email = email;
 		this.uuid = uuid;

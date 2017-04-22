@@ -5,12 +5,14 @@ import java.util.UUID;
 import javax.annotation.Resource;
 
 import org.moshe.arad.entities.BackgammonUser;
-import org.moshe.arad.kafka.ConsumerToFrontServiceQueue;
+import org.moshe.arad.kafka.EventsPollFromConsumerToFrontService;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.CheckUserNameAvailabilityCommand;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
+import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
 import org.moshe.arad.kafka.producers.SimpleBackgammonCommandsProducer;
 import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
+import org.moshe.arad.lockers.SimpleLock;
 import org.moshe.arad.repository.BackgammonUserRepository;
 import org.moshe.arad.websocket.UserNameMessage;
 import org.slf4j.Logger;
@@ -43,11 +45,14 @@ public class HomeService implements ApplicationContextAware {
 	@Autowired
 	private SimpleBackgammonCommandsProducer<CheckUserNameAvailabilityCommand> simpleCheckUserNameAvailabilityCommandProducer;
 	
-	@Resource(name = "CheckUserNameAvailabilityConfig")
-	private SimpleProducerConfig checkUserNameAvailabilityConfig;
+	@Resource(name = "CheckUserNameAvailabilityCommandConfig")
+	private SimpleProducerConfig CheckUserNameAvailabilityCommandConfig;
 	
 	@Autowired
-	private ConsumerToFrontServiceQueue consumerToFrontServiceQueue;
+	private EventsPollFromConsumerToFrontService eventsPollFromConsumerToFrontService;
+	
+	@Autowired
+	private SimpleLock simpleLock;
 	
 	@Deprecated
 	public void registerNewUser(BackgammonUser backgammonUser) {
@@ -61,14 +66,25 @@ public class HomeService implements ApplicationContextAware {
 	}	
 	
 	public boolean isUserNameAvailable(UserNameMessage userNameMessage){
-		simpleCheckUserNameAvailabilityCommandProducer.setSimpleProducerConfig(checkUserNameAvailabilityConfig);
-		simpleCheckUserNameAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC);
-		CheckUserNameAvailabilityCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameAvailabilityCommand.class);
-		checkUserNameAvailabilityCommand.setUserName(userNameMessage.getUserName());
-		simpleCheckUserNameAvailabilityCommandProducer.sendKafkaMessage(checkUserNameAvailabilityCommand);
+		UUID uuidEvent;
+		synchronized (simpleLock) {
+			simpleCheckUserNameAvailabilityCommandProducer.setSimpleProducerConfig(CheckUserNameAvailabilityCommandConfig);
+			simpleCheckUserNameAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC);
+			CheckUserNameAvailabilityCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameAvailabilityCommand.class);			
+			uuidEvent = UUID.randomUUID();
+			checkUserNameAvailabilityCommand.setUuid(uuidEvent);
+			checkUserNameAvailabilityCommand.setUserName(userNameMessage.getUserName());
+			simpleCheckUserNameAvailabilityCommandProducer.sendKafkaMessage(checkUserNameAvailabilityCommand);
+			try {
+				simpleLock.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
-		//TODO need to consume replies and populate using websockets.
-		return false;
+		UserNameAvailabilityCheckedEvent userNameAvailabilityCheckedEvent = (UserNameAvailabilityCheckedEvent) eventsPollFromConsumerToFrontService.takeEventFromPoll(uuidEvent);
+		return userNameAvailabilityCheckedEvent.isAvailable();
 	}
 	
 	public boolean isEmailAvailable(String email){
@@ -97,12 +113,13 @@ public class HomeService implements ApplicationContextAware {
 		this.context = context;
 	}
 
-	public ConsumerToFrontServiceQueue getConsumerToFrontServiceQueue() {
-		return consumerToFrontServiceQueue;
+	public EventsPollFromConsumerToFrontService getEventsPollFromConsumerToFrontService() {
+		return eventsPollFromConsumerToFrontService;
 	}
 
-	public void setConsumerToFrontServiceQueue(ConsumerToFrontServiceQueue consumerToFrontServiceQueue) {
-		this.consumerToFrontServiceQueue = consumerToFrontServiceQueue;
+	public void setEventsPollFromConsumerToFrontService(
+			EventsPollFromConsumerToFrontService eventsPollFromConsumerToFrontService) {
+		this.eventsPollFromConsumerToFrontService = eventsPollFromConsumerToFrontService;
 	}
 }
 

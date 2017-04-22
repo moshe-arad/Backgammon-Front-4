@@ -13,4 +13,7 @@ public class KafkaUtils {
 	public static final String CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC = "Check-User-Name-Availability-Command";
 	public static final String CREATE_NEW_USER_COMMAND_SERIALIZER = "org.moshe.arad.kafka.serializers.CreateNewUserCommandSerializer";
 	public static final String CHECK_USER_NAME_AVAILABILITY_COMMAND_SERIALIZER = "org.moshe.arad.kafka.serializers.CheckUserNameAvailabilityCommandSerializer";
+	public static final String USER_NAME_AVAILABILITY_CHECKED_EVENT_TOPIC = "User-Name-Availability-Checked-Event";
+	public static final String USER_NAME_AVAILABILITY_CHECKED_EVENT_GROUP = "UserNameAvailabilityCheckedEventGroup";
+	public static final Object USER_NAME_AVAILABILITY_CHECKED_EVENT_DESERIALIZER = "org.moshe.arad.kafka.deserializers.UserNameAvailabilityCheckedEventDeserializer";
 }

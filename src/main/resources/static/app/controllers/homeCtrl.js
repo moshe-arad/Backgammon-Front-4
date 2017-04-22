@@ -5,7 +5,28 @@
 	
 		$scope.user = {};
 		$scope.register_error = false;
-				
+		
+		var stompClient = null;
+		
+		var init = function(){
+			var socket = new SockJS('/backgammon-websocket');
+		    stompClient = Stomp.over(socket);
+		    stompClient.connect({}, function (frame) {		      
+		        console.log('Connected: ' + frame);
+		        stompClient.subscribe('/frontEndPoint/user_name', function (data) {
+		            if(JSON.parse(data.body).isAvailable == false){
+		            	angular.element("#invalidEmail").html("Email is not available.");
+						angular.element("#invalidEmail").removeClass("hidden");			            	
+		            }
+		            else{
+		            	console.log("User Name available...")
+		            }
+		        });
+		    });
+		};
+		
+		init();
+		
 		$scope.register = function() {
 			console.log(isPassedValidation());
 			if(isPassedValidation() == "valid"){
@@ -100,15 +121,17 @@
 		
 		/***** user name *****/
 		
-		function checkUserNameAvailable(user){		
-			if(typeof user.userName != "undefined" && user.userName.length >=3)
-			{
-				console.log(user.userName);
-				
-				$timeout(function(){
-					checkAvailable("http://localhost:8080/users/user_name/" + $scope.user.userName + "/")
-					}, 1000, false);
-			}
+		function checkUserNameAvailable(user){
+			
+			stompClient.send("/backEndPoint/users/user_name/", {}, JSON.stringify({'userName': $scope.user.userName}));
+//			if(typeof user.userName != "undefined" && user.userName.length >=3)
+//			{
+//				console.log(user.userName);
+//				
+//				$timeout(function(){
+//					checkAvailable("http://localhost:8080/users/user_name/" + $scope.user.userName + "/")
+//					}, 1000, false);
+//			}
 				
 		}
 		

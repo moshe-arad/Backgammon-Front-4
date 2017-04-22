@@ -10,6 +10,9 @@ public class CheckUserNameAvailabilityCommand implements Commandable {
 	private UUID uuid;
 	private String userName;
 
+	public CheckUserNameAvailabilityCommand() {
+	}
+	
 	public CheckUserNameAvailabilityCommand(UUID uuid, String userName) {
 		this.userName = userName;
 		this.uuid = uuid;

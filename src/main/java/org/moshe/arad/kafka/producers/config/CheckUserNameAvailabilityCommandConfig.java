@@ -3,7 +3,7 @@ package org.moshe.arad.kafka.producers.config;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.springframework.stereotype.Component;
 
-@Component("CheckUserNameAvailabilityConfig")
+@Component("CheckUserNameAvailabilityCommandConfig")
 public class CheckUserNameAvailabilityCommandConfig extends SimpleProducerConfig {
 
 	public CheckUserNameAvailabilityCommandConfig() {

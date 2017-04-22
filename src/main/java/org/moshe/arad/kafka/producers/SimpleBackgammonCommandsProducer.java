@@ -23,9 +23,12 @@ public class SimpleBackgammonCommandsProducer <T extends Commandable> implements
 	private SimpleProducerConfig simpleProducerConfig;
 	private String topic;
 	
-	public SimpleBackgammonCommandsProducer(SimpleProducerConfig simpleProducerConfig, String topic) {
-		this.simpleProducerConfig = simpleProducerConfig;
-		this.topic = topic;
+//	public SimpleBackgammonCommandsProducer(SimpleProducerConfig simpleProducerConfig, String topic) {
+//		this.simpleProducerConfig = simpleProducerConfig;
+//		this.topic = topic;
+//	}
+	
+	public SimpleBackgammonCommandsProducer() {
 	}
 	
 	@Override

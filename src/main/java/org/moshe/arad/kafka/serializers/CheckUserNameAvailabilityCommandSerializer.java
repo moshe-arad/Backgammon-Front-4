@@ -27,7 +27,11 @@ public class CheckUserNameAvailabilityCommandSerializer implements Serializer<Ch
 	public byte[] serialize(String arg0, CheckUserNameAvailabilityCommand command) {
 		
 		byte[] serializedUserName;
-		int sizeOfUserName;		
+		int sizeOfUserName;	
+		
+		long highUuid;
+		
+		long lowUuid;
 		
 		 try {
 			 if (command == null)
@@ -35,10 +39,15 @@ public class CheckUserNameAvailabilityCommandSerializer implements Serializer<Ch
             
 			 serializedUserName = command.getUserName().getBytes(encoding);
 			 sizeOfUserName = command.getUserName().length();
+		
+			 highUuid = command.getUuid().getMostSignificantBits();
+			 lowUuid = command.getUuid().getLeastSignificantBits();
 			 
-			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserName+4);
+			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserName+4+8+8);
 			 buf.putInt(sizeOfUserName);
-			 buf.put(serializedUserName);                            
+			 buf.put(serializedUserName);
+			 buf.putLong(highUuid);
+			 buf.putLong(lowUuid);
              
 	         return buf.array();
 	        } catch (Exception e) {
