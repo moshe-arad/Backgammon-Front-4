@@ -7,6 +7,7 @@ import org.moshe.arad.kafka.commands.Commandable;
 import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 /**
  * 
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
  * important to set topic and properties before usage
  */
 @Component
+@Scope("prototype")
 public class SimpleBackgammonCommandsProducer <T extends Commandable> implements SimpleProducer<T> {
 
 	private final Logger logger = LoggerFactory.getLogger(SimpleBackgammonCommandsProducer.class);

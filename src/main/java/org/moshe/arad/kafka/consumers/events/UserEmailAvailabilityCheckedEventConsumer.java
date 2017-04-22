@@ -3,8 +3,6 @@ package org.moshe.arad.kafka.consumers.events;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
-import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
-import org.moshe.arad.lockers.SimpleLock;
 import org.moshe.arad.services.HomeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +14,6 @@ public class UserEmailAvailabilityCheckedEventConsumer extends SimpleBackgammonE
 
 	@Autowired
 	private HomeService homeService;
-	
-	@Autowired
-	private SimpleLock simpleLock;
 	
 	Logger logger = LoggerFactory.getLogger(UserEmailAvailabilityCheckedEventConsumer.class);
 	

@@ -6,36 +6,53 @@
 		$scope.user = {};
 		$scope.register_error = false;
 		
+		var emailAvailable = false;
+		var userNameAvailable = false;
+		var isSubmitted = false;
 		var stompClient = null;
 		
 		var init = function(){
 			var socket = new SockJS('/backgammon-websocket');
 		    stompClient = Stomp.over(socket);
-//		    stompClient.connect({}, function (frame) {		      
-//		        console.log('Connected: ' + frame);
-//		        stompClient.subscribe('/frontEndPoint/user_name', function (data) {
-//		            if(JSON.parse(data.body).isAvailable == false){
-//		            	angular.element("#invalidUserName").html("User name is not available.")
-//						angular.element("#invalidUserName").removeClass("hidden");		            	
-//		            }
-//		            else{
-//		            	console.log("User Name available...")
-//		            }
-//		        });		      		    
-//		    });
-		    
 		    stompClient.connect({}, function (frame) {		      
 		        console.log('Connected: ' + frame);
+		        stompClient.subscribe('/frontEndPoint/user_name', function (data) {
+		            if(JSON.parse(data.body).isAvailable == false){
+		            	angular.element("#invalidUserName").html("User name is not available.")
+						angular.element("#invalidUserName").removeClass("hidden");		            	
+		            	userNameAvailable = false;
+		            }
+		            else{		            	
+		            	userNameAvailable = true;
+		            	if(emailAvailable == true){		        		            		
+		            		if(isSubmitted == false){
+		            			isSubmitted = true;
+		            			submitForm();		         
+		            		}
+		            	}
+		            	console.log("User Name available...")
+		            }
+		        });
+		        
 		        stompClient.subscribe('/frontEndPoint/email', function (data) {
 		            if(JSON.parse(data.body).isAvailable == false){
 		            	angular.element("#invalidEmail").html("Email is not available.");
 						angular.element("#invalidEmail").removeClass("hidden");			            	
 		            }
 		            else{
+		            	
+		            	emailAvailable = true;
+		            	if(userNameAvailable == true){		           
+		            		if(isSubmitted == false){
+		            			isSubmitted = true;
+		            			submitForm();		         
+		            		}	            		
+		            	}
 		            	console.log("Email available...")
 		            }
-		        });		      		    
-		    });				    
+		        });
+		        
+		    });		 			    
 		};
 		
 		init();
@@ -43,26 +60,33 @@
 		$scope.register = function() {
 			console.log(isPassedValidation());
 			if(isPassedValidation() == "valid"){
-				$http.post("http://localhost:8080/users/", $scope.user)
-				.success(function(data, status) {
-					if(status == 201){
-						$rootScope.isAuthenticated = true;
-						$rootScope.credentials = {username:data.userName};
-						console.log("Navigating to lobby");
-						$location.path("/lobby");	
-					} 
-					else if(status == 500){
-						console.log("Registeration failure");
-						$scope.register_error = "Failed to do registration."
-					}
-				})
-				.error(function (data, status) {
-	              	register_error = "Failed to do registration.";                     
-				});
+				
+				stompClient.send("/backEndPoint/users/email/", {}, JSON.stringify({'email': $scope.user.email}));
+				stompClient.send("/backEndPoint/users/user_name/", {}, JSON.stringify({'userName': $scope.user.userName}));
 			}
 			else{
 				$scope.register_error = isPassedValidation();
 			}
+		}
+		
+		var submitForm = function(){
+			console.log("submitting form..");
+			$http.post("http://localhost:8080/users/", $scope.user)
+			.success(function(data, status) {
+				if(status == 201){
+					$rootScope.isAuthenticated = true;
+					$rootScope.credentials = {username:data.userName};
+					console.log("Navigating to lobby");
+					$location.path("/lobby");	
+				} 
+				else if(status == 500){
+					console.log("Registeration failure");
+					$scope.register_error = "Failed to do registration."
+				}
+			})
+			.error(function (data, status) {
+              	register_error = "Failed to do registration.";                     
+			});
 		}
 		
 		var isPassedValidation = function(){
@@ -71,13 +95,14 @@
 			var lastName = isValidName($scope.user.lastName);
 			var email = checkValidEmail();
 	
+			var userName = checkUserNameValid($scope.user.userName);
 			var password = isValidPassword($scope.user.password) == "valid" ? true:false;
 			var passwordMatch = $scope.user.confirm == $scope.user.password ? true:false; 
 			
 			if(!Boolean(firstName)) return "First name didn't passed validation";
 			if(!Boolean(lastName)) return "Last name didn't passed validation";
 			if(!Boolean(email)) return "Email didn't passed validation";
-//			if(!Boolean(userName)) return "User name didn't passed validation";
+			if(!Boolean(userName)) return "User name didn't passed validation";
 			if(!Boolean(password)) return "password didn't passed validation";
 			if(!Boolean(passwordMatch)) return "password Match didn't passed validation";
 			
@@ -96,20 +121,20 @@
 			
 		$scope.onEmailInsert = checkValidEmail;
 				
-		$scope.onUserNameInsert = checkUserNameAvailable;
+		$scope.onUserNameInsert = checkUserNameValid;
 		
 		$scope.onCheckValidPassword = checkValidPassword;
 		
 		$scope.onCheckPasswordsMatch = checkPasswordsMatch;
 		
-		/***** email *****/
+		/***** email *****/		
 		
 		function checkValidEmail(){
 			
+			
 			if(isValidEmail($scope.user.email)) 
 			{	
-				angular.element("#invalidEmail").addClass("hidden");
-				checkEmailAvailable($scope.user);					
+				angular.element("#invalidEmail").addClass("hidden");								
 				return true;
 			}
 			else{
@@ -119,13 +144,6 @@
 			}
 		}
 		
-		function checkEmailAvailable(user){
-			stompClient.send("/backEndPoint/users/email/", {}, JSON.stringify({'email': $scope.user.email}));
-//			$timeout(function(){
-//				checkAvailable("http://localhost:8080/users/email/" + $scope.user.email + "/")
-//			} , 1000, false);
-		}
-		
 		var isValidEmail = function (email){
 			var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 			
@@ -133,56 +151,27 @@
 			else return true;
 		}
 		
-		/***** user name *****/
+		/***** user name *****/		
 		
-		function checkUserNameAvailable(user){
-			
-			stompClient.send("/backEndPoint/users/user_name/", {}, JSON.stringify({'userName': $scope.user.userName}));
-//			if(typeof user.userName != "undefined" && user.userName.length >=3)
-//			{
-//				console.log(user.userName);
-//				
-//				$timeout(function(){
-//					checkAvailable("http://localhost:8080/users/user_name/" + $scope.user.userName + "/")
-//					}, 1000, false);
-//			}
-				
-		}
-		
-		function checkAvailable(url){
-			
-			var config = {
-					method:"GET",
-					url:url
-			};
-			
-			$http(config).then(function success(response){
-				successCheckAvailable(response.data);			
-			}, function error(response){
-				errorFunc(response.status);
-			});
-		}
-
-		function errorFunc(status){
-			console.log(status);
-		}
-		
-		function successCheckAvailable(jsonObj){
-			console.log("Json object result is: " + jsonObj);
-			
-			if(jsonObj == "") {
-				angular.element("#invalidUserName").addClass("hidden");
+		function checkUserNameValid(user){
+			if(isValidUserName($scope.user.userName)){
+				angular.element("#invalidUserName").addClass("hidden");				
+				return true;
 			}
-			else {
-				if(jsonObj == "Email is not available.") {
-					angular.element("#invalidEmail").html(jsonObj);
-					angular.element("#invalidEmail").removeClass("hidden");					
-				}
-				else if(jsonObj == "User name is not available."){
-					angular.element("#invalidUserName").html("User name is not available.")
-					angular.element("#invalidUserName").removeClass("hidden");
-				}
+			else{
+				angular.element("#invalidUserName").html("Invalid user name.");
+				angular.element("#invalidUserName").removeClass("hidden");
+				return false;
 			}
+			
+		}
+		
+		var isValidUserName = function(name){
+			
+			var re = /^[A-Z|a-z|0-9| \\-]+$/;
+			
+			if(!re.test(name)) return false;
+			else return true;
 		}
 		
 		/************** password ************/
@@ -246,7 +235,7 @@
 		/************* password match ***********/
 		function checkPasswordsMatch(user){
 			
-			console.log(user.confirm);
+//			console.log(user.confirm);
 			$interval(function(){
 				if(angular.isDefined(user.confirm) && angular.isDefined(user.password)){					
 					if(user.confirm != user.password){

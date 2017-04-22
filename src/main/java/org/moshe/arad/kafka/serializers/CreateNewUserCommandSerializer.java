@@ -31,6 +31,17 @@ public class CreateNewUserCommandSerializer implements Serializer<CreateNewUserC
 		byte[] serializedPassword;
 		int sizeOfPassword;
 		
+		byte[] serializedFirstName;
+		int sizeOfFirstName;		
+		byte[] serializedLastName;
+		int sizeOfLastName;
+		
+		byte[] serializedEmail;
+		int sizeOfEmail;		
+		
+		long highUuid;
+		long lowUuid;
+		
 		 try {
 			 if (command == null)
 				 return null;
@@ -41,12 +52,36 @@ public class CreateNewUserCommandSerializer implements Serializer<CreateNewUserC
 			 serializedPassword = command.getBackgammonUser().getPassword().getBytes(encoding);
 			 sizeOfPassword = command.getBackgammonUser().getPassword().length();
 			 
-			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserName+4+sizeOfPassword+4);
+			 serializedFirstName = command.getBackgammonUser().getFirstName().getBytes(encoding);
+			 sizeOfFirstName = command.getBackgammonUser().getFirstName().length();
+			 
+			 serializedLastName = command.getBackgammonUser().getLastName().getBytes(encoding);
+			 sizeOfLastName = command.getBackgammonUser().getLastName().length();
+			 
+			 serializedEmail = command.getBackgammonUser().getEmail().getBytes(encoding);
+			 sizeOfEmail = command.getBackgammonUser().getEmail().length();
+			 
+			 highUuid =  command.getUuid().getMostSignificantBits();
+			 lowUuid = command.getUuid().getLeastSignificantBits();
+			 
+			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserName+4+sizeOfPassword+4+sizeOfFirstName+4+sizeOfLastName+4+sizeOfEmail+4+8+8);
 			 buf.putInt(sizeOfUserName);
 			 buf.put(serializedUserName);        
             
 			 buf.putInt(sizeOfPassword);
              buf.put(serializedPassword);                    
+             
+             buf.putInt(sizeOfFirstName);
+             buf.put(serializedFirstName);
+             
+             buf.putInt(sizeOfLastName);
+             buf.put(serializedLastName);
+             
+             buf.putInt(sizeOfEmail);
+             buf.put(serializedEmail);
+             
+             buf.putLong(highUuid);
+             buf.putLong(lowUuid);
              
 	         return buf.array();
 	        } catch (Exception e) {

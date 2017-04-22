@@ -14,7 +14,6 @@ import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
 import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
 import org.moshe.arad.kafka.producers.SimpleBackgammonCommandsProducer;
 import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
-import org.moshe.arad.lockers.SimpleLock;
 import org.moshe.arad.repository.BackgammonUserRepository;
 import org.moshe.arad.websocket.EmailMessage;
 import org.moshe.arad.websocket.UserNameMessage;
@@ -58,21 +57,7 @@ public class HomeService implements ApplicationContextAware {
 	private SimpleProducerConfig checkUserEmailAvailabilityConfig;
 	
 	@Autowired
-	private EventsPollFromConsumerToFrontService eventsPollFromConsumerToFrontService;
-	
-	@Autowired
-	private SimpleLock simpleLock;
-	
-	@Deprecated
-	public void registerNewUser(BackgammonUser backgammonUser) {
-		
-//		if(!isEmailAvailable(backgammonUser.getEmail()) || !isUserNameAvailable(backgammonUser.getUsername())) throw new RuntimeException("Email or user name is already taken.");
-//		logger.info("User's email and user name are available.");
-//		backgammonUser.setEnabled(true);
-//		backgammonUserRepository.save(backgammonUser);
-//		authenticateUser(backgammonUser);
-//		logger.info("User saved to local DB, and authenticated.");
-	}	
+	private EventsPollFromConsumerToFrontService eventsPollFromConsumerToFrontService;	
 	
 	public boolean isUserNameAvailable(UserNameMessage userNameMessage){
 		UUID uuidEvent;
@@ -85,7 +70,7 @@ public class HomeService implements ApplicationContextAware {
 		simpleCheckUserNameAvailabilityCommandProducer.sendKafkaMessage(checkUserNameAvailabilityCommand);
 		
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -105,7 +90,7 @@ public class HomeService implements ApplicationContextAware {
 		simpleCheckUserEmailAvailabilityCommandProducer.sendKafkaMessage(checkUserEmailAvailabilityCommand);
 
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -122,7 +107,14 @@ public class HomeService implements ApplicationContextAware {
 		CreateNewUserCommand createNewUserCommand = context.getBean(CreateNewUserCommand.class);
 		createNewUserCommand.setUuid(UUID.randomUUID());
 		createNewUserCommand.setBackgammonUser(backgammonUser);
-		simpleCreateNewUserCommandProducer.sendKafkaMessage(createNewUserCommand);		
+		simpleCreateNewUserCommandProducer.sendKafkaMessage(createNewUserCommand);
+		
+		if(!isEmailAvailable(new EmailMessage(backgammonUser.getEmail())) || !isUserNameAvailable(new UserNameMessage(backgammonUser.getUsername()))) throw new RuntimeException("Email or user name is already taken.");
+		logger.info("User's email and user name are available.");
+		backgammonUser.setEnabled(true);
+		backgammonUserRepository.save(backgammonUser);
+		authenticateUser(backgammonUser);
+		logger.info("User saved to local DB, and authenticated.");
 	}
 	
 	private void authenticateUser(BackgammonUser backgammonUser) {

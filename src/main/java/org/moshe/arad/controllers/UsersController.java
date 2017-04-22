@@ -59,7 +59,6 @@ public class UsersController {
 		logger.info("The GameUser bind result: " + backgammonUser);
 		
 		try{
-//			homeService.registerNewUser(backgammonUser);
 			
 			homeService.createNewUser(backgammonUser);
 			
