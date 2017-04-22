@@ -31,11 +31,11 @@ public class CheckUserEmailAvailabilityCommand implements Commandable {
 		this.email = email;
 	}
 
-	protected UUID getUuid() {
+	public UUID getUuid() {
 		return uuid;
 	}
 
-	protected void setUuid(UUID uuid) {
+	public void setUuid(UUID uuid) {
 		this.uuid = uuid;
 	}
 }

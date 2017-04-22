@@ -5,6 +5,8 @@ import javax.validation.Valid;
 import org.moshe.arad.entities.BackgammonUser;
 import org.moshe.arad.services.HomeService;
 import org.moshe.arad.validators.BackgammonUserValidator;
+import org.moshe.arad.websocket.EmailAvailabilityMessage;
+import org.moshe.arad.websocket.EmailMessage;
 import org.moshe.arad.websocket.UserNameAvailabilityMessage;
 import org.moshe.arad.websocket.UserNameMessage;
 import org.slf4j.Logger;
@@ -96,29 +98,22 @@ public class UsersController {
 		}
 	}
 	
-	@RequestMapping(value = "/users/email/{email}/", method = RequestMethod.GET)
-	public ResponseEntity<String> isUserEmailAvailable(@PathVariable String email){
+	@MessageMapping("/users/email/")
+	@SendTo("/frontEndPoint/email")
+	public EmailAvailabilityMessage isUserEmailAvailable(EmailMessage emailMessage){
+		boolean isAvailable = false;
+		
 		try{
-			logger.info("Email bind result: " + email);
-			if(homeService.isEmailAvailable(email)){
-				logger.info("Email available for registeration.");
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "text/html");
-				return new ResponseEntity<>("", headers, HttpStatus.OK);
-			}
-			else{
-				logger.info("Email not available can't register.");
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "text/html");
-				return new ResponseEntity<>("Email is not available.", headers, HttpStatus.OK);
-			}
+			logger.info("Email bind result: " + emailMessage);
+			isAvailable = homeService.isEmailAvailable(emailMessage);
+			if(isAvailable) logger.info("Email available for registeration.");
+			else logger.info("Email not available can't register.");
+			return new EmailAvailabilityMessage(isAvailable);
 		}
 		catch(Exception ex){
 			logger.error(ex.getMessage());
 			logger.error(ex.toString());
-			HttpHeaders headers = new HttpHeaders();
-			headers.add("Content-Type", "text/html");
-			return new ResponseEntity<String>("Ajax call encountred a server error.", headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new EmailAvailabilityMessage(false);
 		}
 	}
 	

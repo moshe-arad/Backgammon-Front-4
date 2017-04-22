@@ -29,8 +29,7 @@ public class CheckUserNameAvailabilityCommandSerializer implements Serializer<Ch
 		byte[] serializedUserName;
 		int sizeOfUserName;	
 		
-		long highUuid;
-		
+		long highUuid;		
 		long lowUuid;
 		
 		 try {

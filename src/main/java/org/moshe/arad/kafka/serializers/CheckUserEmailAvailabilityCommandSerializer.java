@@ -30,6 +30,9 @@ public class CheckUserEmailAvailabilityCommandSerializer  implements Serializer<
 		byte[] serializedEmail;
 		int sizeOfUserEmail;		
 		
+		long highUuid;		
+		long lowUuid;
+		
 		 try {
 			 if (command == null)
 				 return null;
@@ -37,10 +40,16 @@ public class CheckUserEmailAvailabilityCommandSerializer  implements Serializer<
 			 serializedEmail = command.getEmail().getBytes(encoding);
 			 sizeOfUserEmail = command.getEmail().length();
 			 
-			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserEmail+4);
+			 highUuid = command.getUuid().getMostSignificantBits();
+			 lowUuid = command.getUuid().getLeastSignificantBits();
+			 
+			 ByteBuffer buf = ByteBuffer.allocate(sizeOfUserEmail+4+8+8);
 			 buf.putInt(sizeOfUserEmail);
 			 buf.put(serializedEmail);                            
              
+			 buf.putLong(highUuid);
+			 buf.putLong(lowUuid);
+			 
 	         return buf.array();
 	        } catch (Exception e) {
 	            throw new SerializationException("Error when serializing CheckUserEmailAvailabilityCommand to byte[]");

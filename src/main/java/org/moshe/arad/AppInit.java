@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.consumers.events.SimpleBackgammonEventsConsumer;
+import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
 import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,12 @@ public class AppInit {
 	@Resource(name = "UserNameAvailabilityCheckedEventConfig")
 	private SimpleConsumerConfig userNameAvailabilityCheckedEventConfig;
 	
+	@Resource(name = "UserEmailAvailabilityCheckedEventConsumer")
+	private SimpleBackgammonEventsConsumer<UserEmailAvailabilityCheckedEvent> userEmailAvailabilityCheckedEventConsumer;
+	
+	@Resource(name = "UserEmailAvailabilityCheckedEventConfig")
+	private SimpleConsumerConfig userEamilAvailabilityCheckedEventConfig;
+	
 	public void acceptNewEvents(){
 		logger.info("Started to accept new events from services...");
 		
@@ -33,7 +40,12 @@ public class AppInit {
 		userNameAvailabilityCheckedEventConsumer.setSimpleConsumerConfig(userNameAvailabilityCheckedEventConfig);
 		userNameAvailabilityCheckedEventConsumer.initConsumer();
 		executor.execute(userNameAvailabilityCheckedEventConsumer);
-	
+			
+		userEmailAvailabilityCheckedEventConsumer.setTopic(KafkaUtils.EMAIL_AVAILABILITY_CHECKED_EVENT_TOPIC);
+		userEmailAvailabilityCheckedEventConsumer.setSimpleConsumerConfig(userEamilAvailabilityCheckedEventConfig);
+		userEmailAvailabilityCheckedEventConsumer.initConsumer();
+		executor.execute(userEmailAvailabilityCheckedEventConsumer);
+		
 		logger.info("Stopped to accept new events from services...");
 	}
 	

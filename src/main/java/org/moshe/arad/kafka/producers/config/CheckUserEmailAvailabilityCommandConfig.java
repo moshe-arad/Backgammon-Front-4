@@ -9,6 +9,6 @@ public class CheckUserEmailAvailabilityCommandConfig extends SimpleProducerConfi
 	
 	public CheckUserEmailAvailabilityCommandConfig() {
 		super();
-		super.getProperties().put("value.serializer", KafkaUtils.NEW_USER_CREATED_EVENT_SERIALIZER);
+		super.getProperties().put("value.serializer", KafkaUtils.CHECK_EMAIL_AVAILABILITY_COMMAND_SERIALIZER);
 	}
 }

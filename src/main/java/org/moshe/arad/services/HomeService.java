@@ -7,13 +7,16 @@ import javax.annotation.Resource;
 import org.moshe.arad.entities.BackgammonUser;
 import org.moshe.arad.kafka.EventsPollFromConsumerToFrontService;
 import org.moshe.arad.kafka.KafkaUtils;
+import org.moshe.arad.kafka.commands.CheckUserEmailAvailabilityCommand;
 import org.moshe.arad.kafka.commands.CheckUserNameAvailabilityCommand;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
+import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
 import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
 import org.moshe.arad.kafka.producers.SimpleBackgammonCommandsProducer;
 import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
 import org.moshe.arad.lockers.SimpleLock;
 import org.moshe.arad.repository.BackgammonUserRepository;
+import org.moshe.arad.websocket.EmailMessage;
 import org.moshe.arad.websocket.UserNameMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +52,12 @@ public class HomeService implements ApplicationContextAware {
 	private SimpleProducerConfig CheckUserNameAvailabilityCommandConfig;
 	
 	@Autowired
+	private SimpleBackgammonCommandsProducer<CheckUserEmailAvailabilityCommand> simpleCheckUserEmailAvailabilityCommandProducer;
+	
+	@Resource(name = "CheckUserEmailAvailabilityConfig")
+	private SimpleProducerConfig checkUserEmailAvailabilityConfig;
+	
+	@Autowired
 	private EventsPollFromConsumerToFrontService eventsPollFromConsumerToFrontService;
 	
 	@Autowired
@@ -67,30 +76,44 @@ public class HomeService implements ApplicationContextAware {
 	
 	public boolean isUserNameAvailable(UserNameMessage userNameMessage){
 		UUID uuidEvent;
-		synchronized (simpleLock) {
-			simpleCheckUserNameAvailabilityCommandProducer.setSimpleProducerConfig(CheckUserNameAvailabilityCommandConfig);
-			simpleCheckUserNameAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC);
-			CheckUserNameAvailabilityCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameAvailabilityCommand.class);			
-			uuidEvent = UUID.randomUUID();
-			checkUserNameAvailabilityCommand.setUuid(uuidEvent);
-			checkUserNameAvailabilityCommand.setUserName(userNameMessage.getUserName());
-			simpleCheckUserNameAvailabilityCommandProducer.sendKafkaMessage(checkUserNameAvailabilityCommand);
-			try {
-				simpleLock.wait();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		simpleCheckUserNameAvailabilityCommandProducer.setSimpleProducerConfig(CheckUserNameAvailabilityCommandConfig);
+		simpleCheckUserNameAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC);
+		CheckUserNameAvailabilityCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameAvailabilityCommand.class);			
+		uuidEvent = UUID.randomUUID();
+		checkUserNameAvailabilityCommand.setUuid(uuidEvent);
+		checkUserNameAvailabilityCommand.setUserName(userNameMessage.getUserName());
+		simpleCheckUserNameAvailabilityCommandProducer.sendKafkaMessage(checkUserNameAvailabilityCommand);
 		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		UserNameAvailabilityCheckedEvent userNameAvailabilityCheckedEvent = (UserNameAvailabilityCheckedEvent) eventsPollFromConsumerToFrontService.takeEventFromPoll(uuidEvent);
 		return userNameAvailabilityCheckedEvent.isAvailable();
 	}
 	
-	public boolean isEmailAvailable(String email){
-//		List<String> emails = backgammonUserRepository.findAll().stream().map(backgammonUser -> backgammonUser.getEmail()).collect(Collectors.toList());
-//		return !emails.contains(email);
-		return false;
+	public boolean isEmailAvailable(EmailMessage emailMessage){
+		UUID uuidEvent;
+		simpleCheckUserEmailAvailabilityCommandProducer.setSimpleProducerConfig(checkUserEmailAvailabilityConfig);
+		simpleCheckUserEmailAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_EMAIL_AVAILABILITY_COMMAND_TOPIC);		
+		CheckUserEmailAvailabilityCommand checkUserEmailAvailabilityCommand = context.getBean(CheckUserEmailAvailabilityCommand.class);			
+		uuidEvent = UUID.randomUUID();
+		checkUserEmailAvailabilityCommand.setUuid(uuidEvent);
+		checkUserEmailAvailabilityCommand.setEmail(emailMessage.getEmail());
+		simpleCheckUserEmailAvailabilityCommandProducer.sendKafkaMessage(checkUserEmailAvailabilityCommand);
+
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		UserEmailAvailabilityCheckedEvent userEmailAvailabilityCheckedEvent = (UserEmailAvailabilityCheckedEvent) eventsPollFromConsumerToFrontService.takeEventFromPoll(uuidEvent);
+		return userEmailAvailabilityCheckedEvent.isAvailable();
 	}
 	
 	public void createNewUser(BackgammonUser backgammonUser){
