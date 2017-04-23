@@ -26,13 +26,15 @@ public class UserNameAvailabilityCheckedEventConsumer extends SimpleBackgammonEv
 
 	@Override
 	public void consumerOperations(ConsumerRecord<String,UserNameAvailabilityCheckedEvent> record) {
-//		synchronized (simpleLock) {
+		Object locker = homeService.getEventsPollFromConsumerToFrontService().getUserNamesMesaageLoockers().get(record.value().getUuid().toString());
+		synchronized (locker) {
 			logger.info("User Name Availability Checked Event record recieved, " + record.value());
 			logger.info("passing event to home service queue...");
 			homeService.getEventsPollFromConsumerToFrontService().addEventToPool(record.value());
 			logger.info("User Name Availability Checked Event record passed to home service...");
-//			simpleLock.notify();
-//		}		
+			locker.notifyAll();
+		}
+			
 	}	
 }
 

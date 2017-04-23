@@ -69,12 +69,15 @@ public class HomeService implements ApplicationContextAware {
 		checkUserNameAvailabilityCommand.setUserName(userNameMessage.getUserName());
 		simpleCheckUserNameAvailabilityCommandProducer.sendKafkaMessage(checkUserNameAvailabilityCommand);
 		
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		synchronized (userNameMessage) {
+			eventsPollFromConsumerToFrontService.getUserNamesMesaageLoockers().put(uuidEvent.toString(), userNameMessage);
+			try {
+				userNameMessage.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+		
 		UserNameAvailabilityCheckedEvent userNameAvailabilityCheckedEvent = (UserNameAvailabilityCheckedEvent) eventsPollFromConsumerToFrontService.takeEventFromPoll(uuidEvent);
 		return userNameAvailabilityCheckedEvent.isAvailable();
 	}
@@ -89,11 +92,13 @@ public class HomeService implements ApplicationContextAware {
 		checkUserEmailAvailabilityCommand.setEmail(emailMessage.getEmail());
 		simpleCheckUserEmailAvailabilityCommandProducer.sendKafkaMessage(checkUserEmailAvailabilityCommand);
 
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		synchronized (emailMessage) {
+			eventsPollFromConsumerToFrontService.getUserEmailsMesaageLoockers().put(uuidEvent.toString(), emailMessage);
+			try {
+				emailMessage.wait();
+			} catch (InterruptedException e) {				
+				e.printStackTrace();
+			}
 		}
 
 		
@@ -106,10 +111,10 @@ public class HomeService implements ApplicationContextAware {
 		simpleCreateNewUserCommandProducer.setTopic(KafkaUtils.CREATE_NEW_USER_COMMAND_TOPIC);
 		CreateNewUserCommand createNewUserCommand = context.getBean(CreateNewUserCommand.class);
 		createNewUserCommand.setUuid(UUID.randomUUID());
-		createNewUserCommand.setBackgammonUser(backgammonUser);
-		simpleCreateNewUserCommandProducer.sendKafkaMessage(createNewUserCommand);
+		createNewUserCommand.setBackgammonUser(backgammonUser);		
 		
 		if(!isEmailAvailable(new EmailMessage(backgammonUser.getEmail())) || !isUserNameAvailable(new UserNameMessage(backgammonUser.getUsername()))) throw new RuntimeException("Email or user name is already taken.");
+		simpleCreateNewUserCommandProducer.sendKafkaMessage(createNewUserCommand);
 		logger.info("User's email and user name are available.");
 		backgammonUser.setEnabled(true);
 		backgammonUserRepository.save(backgammonUser);

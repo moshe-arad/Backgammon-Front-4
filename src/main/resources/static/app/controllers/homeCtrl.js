@@ -47,11 +47,11 @@
 		        });
 		        
 		    });		 			    
-		};
+		};		
 		
 		init();
 		
-		$scope.register = function() {
+		$scope.register = function() {						
 			console.log(isPassedValidation());
 			if(isPassedValidation() == "valid"){
 				submitForm();				
@@ -252,6 +252,12 @@
 			
 		}
 	}
+	
+	$(function () {
+	    $("registerForm").on('submit', function (e) {
+	        e.preventDefault();
+	    });	
+	});
 	
 	backgammonApp.controller("HomeCtrl", HomeCtrl);
 })();

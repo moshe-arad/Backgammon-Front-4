@@ -26,13 +26,15 @@ public class UserEmailAvailabilityCheckedEventConsumer extends SimpleBackgammonE
 
 	@Override
 	public void consumerOperations(ConsumerRecord<String,UserEmailAvailabilityCheckedEvent> record) {
-//		synchronized (simpleLock) {
+		Object locker = homeService.getEventsPollFromConsumerToFrontService().getUserEmailsMesaageLoockers().get(record.value().getUuid().toString());
+		
+		synchronized (locker) {
 			logger.info("User Email Availability Checked Event record recieved, " + record.value());
 			logger.info("passing event to home service queue...");
 			homeService.getEventsPollFromConsumerToFrontService().addEventToPool(record.value());
 			logger.info("User Email Availability Checked Event record passed to home service...");
-//			simpleLock.notify();
-//		}		
+			locker.notifyAll();
+		}				
 	}	
 }
 
