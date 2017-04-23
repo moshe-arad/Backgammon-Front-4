@@ -6,9 +6,15 @@
 		$scope.user = {};
 		$scope.register_error = false;
 		
-		var emailAvailable = false;
-		var userNameAvailable = false;
-		var isSubmitted = false;
+		var isEmailAvailable = false;
+		var isUserNameAvailable = false;
+		
+		var isFirstNamePassedValidation = false;
+		var isLastNamePassedValidation = false;
+		var isEmailPassedValidation = false;
+		var isUserNamePassedValidation = false;
+		var isPasswordPassedValidation = false;
+		
 		var stompClient = null;
 		
 		var init = function(){
@@ -20,16 +26,10 @@
 		            if(JSON.parse(data.body).isAvailable == false){
 		            	angular.element("#invalidUserName").html("User name is not available.")
 						angular.element("#invalidUserName").removeClass("hidden");		            	
-		            	userNameAvailable = false;
+		            	isUserNamePassedValidation = false;
 		            }
-		            else{		            	
-		            	userNameAvailable = true;
-		            	if(emailAvailable == true){		        		            		
-		            		if(isSubmitted == false){
-		            			isSubmitted = true;
-		            			submitForm();		         
-		            		}
-		            	}
+		            else{		            			            	
+		            	isUserNamePassedValidation = true;
 		            	console.log("User Name available...")
 		            }
 		        });
@@ -37,17 +37,11 @@
 		        stompClient.subscribe('/frontEndPoint/email', function (data) {
 		            if(JSON.parse(data.body).isAvailable == false){
 		            	angular.element("#invalidEmail").html("Email is not available.");
-						angular.element("#invalidEmail").removeClass("hidden");			            	
+						angular.element("#invalidEmail").removeClass("hidden");	
+						isEmailPassedValidation = false;
 		            }
-		            else{
-		            	
-		            	emailAvailable = true;
-		            	if(userNameAvailable == true){		           
-		            		if(isSubmitted == false){
-		            			isSubmitted = true;
-		            			submitForm();		         
-		            		}	            		
-		            	}
+		            else{		            	
+		            	isEmailPassedValidation = true;		          
 		            	console.log("Email available...")
 		            }
 		        });
@@ -60,9 +54,7 @@
 		$scope.register = function() {
 			console.log(isPassedValidation());
 			if(isPassedValidation() == "valid"){
-				
-				stompClient.send("/backEndPoint/users/email/", {}, JSON.stringify({'email': $scope.user.email}));
-				stompClient.send("/backEndPoint/users/user_name/", {}, JSON.stringify({'userName': $scope.user.userName}));
+				submitForm();				
 			}
 			else{
 				$scope.register_error = isPassedValidation();
@@ -70,7 +62,7 @@
 		}
 		
 		var submitForm = function(){
-			console.log("submitting form..");
+			console.log("submitting form...");
 			$http.post("http://localhost:8080/users/", $scope.user)
 			.success(function(data, status) {
 				if(status == 201){
@@ -91,22 +83,34 @@
 		
 		var isPassedValidation = function(){
 			
-			var firstName = isValidName($scope.user.firstName);
-			var lastName = isValidName($scope.user.lastName);
-			var email = checkValidEmail();
-	
-			var userName = checkUserNameValid($scope.user.userName);
+//			var firstName = isValidName($scope.user.firstName);
+//			var lastName = isValidName($scope.user.lastName);
+//			var email = checkValidEmail();
+//	
+//			var userName = checkUserNameValid($scope.user.userName);
+//			var password = isValidPassword($scope.user.password) == "valid" ? true:false;
+//			var passwordMatch = $scope.user.confirm == $scope.user.password ? true:false; 
+//			
+//			if(!Boolean(firstName)) return "First name didn't passed validation";
+//			if(!Boolean(lastName)) return "Last name didn't passed validation";
+//			if(!Boolean(email)) return "Email didn't passed validation";
+//			if(!Boolean(userName)) return "User name didn't passed validation";
+//			if(!Boolean(password)) return "password didn't passed validation";
+//			if(!Boolean(passwordMatch)) return "password Match didn't passed validation";
+			
+			isFirstNamePassedValidation = isValidName($scope.user.firstName); 
+			isLastNamePassedValidation = isValidName($scope.user.lastName);
 			var password = isValidPassword($scope.user.password) == "valid" ? true:false;
 			var passwordMatch = $scope.user.confirm == $scope.user.password ? true:false; 
-			
-			if(!Boolean(firstName)) return "First name didn't passed validation";
-			if(!Boolean(lastName)) return "Last name didn't passed validation";
-			if(!Boolean(email)) return "Email didn't passed validation";
-			if(!Boolean(userName)) return "User name didn't passed validation";
-			if(!Boolean(password)) return "password didn't passed validation";
-			if(!Boolean(passwordMatch)) return "password Match didn't passed validation";
-			
-			return "valid";
+			isPasswordPassedValidation = password && passwordMatch; 
+				
+			if((isFirstNamePassedValidation == true)&&
+			   (isLastNamePassedValidation == true)&&
+			   (isEmailPassedValidation == true)&&
+			   (isUserNamePassedValidation == true)&&
+			   (isPasswordPassedValidation == true))
+				return "valid";
+			else return "not valid";
 		}
 		
 		var isValidName = function(name){
@@ -129,19 +133,18 @@
 		
 		/***** email *****/		
 		
-		function checkValidEmail(){
-			
-			
-			if(isValidEmail($scope.user.email)) 
-			{	
-				angular.element("#invalidEmail").addClass("hidden");								
-				return true;
-			}
-			else{
-				angular.element("#invalidEmail").html("Invalid email address.");
-				angular.element("#invalidEmail").removeClass("hidden");
-				return false;
-			}
+		function checkValidEmail(){	
+			if($scope.user.email != undefined && ($scope.user.email).trim() != ""){
+				if(isValidEmail($scope.user.email)) 
+				{	
+					angular.element("#invalidEmail").addClass("hidden");
+					stompClient.send("/backEndPoint/users/email/", {}, JSON.stringify({'email': $scope.user.email}));
+				}
+				else{
+					angular.element("#invalidEmail").html("Invalid email address.");
+					angular.element("#invalidEmail").removeClass("hidden");
+				}
+			}			
 		}
 		
 		var isValidEmail = function (email){
@@ -154,16 +157,16 @@
 		/***** user name *****/		
 		
 		function checkUserNameValid(user){
-			if(isValidUserName($scope.user.userName)){
-				angular.element("#invalidUserName").addClass("hidden");				
-				return true;
-			}
-			else{
-				angular.element("#invalidUserName").html("Invalid user name.");
-				angular.element("#invalidUserName").removeClass("hidden");
-				return false;
-			}
-			
+			if($scope.user.userName != undefined && ($scope.user.userName).trim() != ""){
+				if(isValidUserName($scope.user.userName)){
+					angular.element("#invalidUserName").addClass("hidden");
+					stompClient.send("/backEndPoint/users/user_name/", {}, JSON.stringify({'userName': $scope.user.userName}));				
+				}
+				else{
+					angular.element("#invalidUserName").html("Invalid user name.");
+					angular.element("#invalidUserName").removeClass("hidden");				
+				}
+			}						
 		}
 		
 		var isValidUserName = function(name){
@@ -235,7 +238,6 @@
 		/************* password match ***********/
 		function checkPasswordsMatch(user){
 			
-//			console.log(user.confirm);
 			$interval(function(){
 				if(angular.isDefined(user.confirm) && angular.isDefined(user.password)){					
 					if(user.confirm != user.password){
