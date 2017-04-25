@@ -12,18 +12,11 @@ public class UserEmailAvailabilityCheckedEvent extends BackgammonEvent{
 	
 	public UserEmailAvailabilityCheckedEvent() {
 	}
-	
-	public UserEmailAvailabilityCheckedEvent(UUID uuid, int serviceId, String serviceName, int entityId,
-			String entityType, int eventId, String eventType, boolean isAvailable) {
-		super(uuid, serviceId, serviceName, entityId, entityType, eventId, eventType);
-		this.isAvailable = isAvailable;
-	}
 
-	public UserEmailAvailabilityCheckedEvent(UUID uuid, int serviceId, String serviceName, int entityId,
-			String entityType, int eventId, String eventType, Date arrived, boolean isAvailable) {
-		super(uuid, serviceId, serviceName, entityId, entityType, eventId, eventType, arrived);
+	public UserEmailAvailabilityCheckedEvent(UUID uuid, int serviceId, int eventId, Date arrived, boolean isAvailable) {
+		super(uuid, serviceId, eventId, arrived);
 		this.isAvailable = isAvailable;
-	}
+	}	
 
 	@Override
 	public String toString() {
