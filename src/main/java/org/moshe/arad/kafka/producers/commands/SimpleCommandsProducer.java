@@ -1,9 +1,11 @@
-package org.moshe.arad.kafka.producers;
+package org.moshe.arad.kafka.producers.commands;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.moshe.arad.kafka.commands.ICommand;
+import org.moshe.arad.kafka.producers.ISimpleProducer;
+import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -21,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Component
 @Scope("prototype")
-public class SimpleCommandsProducer <T extends ICommand> implements ISimpleProducer<T> {
+public class SimpleCommandsProducer <T extends ICommand> implements ISimpleCommandProducer<T> {
 
 	private final Logger logger = LoggerFactory.getLogger(SimpleCommandsProducer.class);
 	private SimpleProducerConfig simpleProducerConfig;
