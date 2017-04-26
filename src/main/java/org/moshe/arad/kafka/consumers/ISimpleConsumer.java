@@ -4,7 +4,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 
-public interface SimpleConsumer {
+public interface ISimpleConsumer {
 
 	public void setTopic(String topic);
 	

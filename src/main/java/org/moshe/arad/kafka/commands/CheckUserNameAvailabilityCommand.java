@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component("CheckUserNameAvailabilityCommand")
-public class CheckUserNameAvailabilityCommand implements Commandable {
+public class CheckUserNameAvailabilityCommand implements ICommand {
 
 	private UUID uuid;
 	private String userName;

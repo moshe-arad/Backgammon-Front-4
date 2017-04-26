@@ -7,7 +7,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
 
-public class BackgammonUserValidator implements Validator, EntityValidator {
+public class BackgammonUserValidator implements Validator, IEntityValidator {
 
 	private final static Logger logger = LoggerFactory.getLogger(BackgammonUserValidator.class);
 	

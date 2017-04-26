@@ -12,9 +12,9 @@ import org.moshe.arad.kafka.commands.CheckUserNameAvailabilityCommand;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
 import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
 import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
-import org.moshe.arad.kafka.producers.SimpleBackgammonCommandsProducer;
-import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
-import org.moshe.arad.repository.BackgammonUserRepository;
+import org.moshe.arad.kafka.producers.SimpleCommandsProducer;
+import org.moshe.arad.kafka.producers.SimpleProducerConfig;
+import org.moshe.arad.repository.IBackgammonUserRepository;
 import org.moshe.arad.websocket.EmailMessage;
 import org.moshe.arad.websocket.UserNameMessage;
 import org.slf4j.Logger;
@@ -34,34 +34,28 @@ public class HomeService implements ApplicationContextAware {
 	private Logger logger = LoggerFactory.getLogger(HomeService.class);
 
 	@Autowired
-	private BackgammonUserRepository backgammonUserRepository;
+	private IBackgammonUserRepository backgammonUserRepository;
 	
 	private ApplicationContext context;
 	
 	@Autowired
-	private SimpleBackgammonCommandsProducer<CreateNewUserCommand> simpleCreateNewUserCommandProducer;
-	
-	@Resource(name = "CreateNewUserCommandConfig")
-	private SimpleProducerConfig createNewUserCommandConfig;	
+	private SimpleCommandsProducer<CreateNewUserCommand> simpleCreateNewUserCommandProducer;
 	
 	@Autowired
-	private SimpleBackgammonCommandsProducer<CheckUserNameAvailabilityCommand> simpleCheckUserNameAvailabilityCommandProducer;
-	
-	@Resource(name = "CheckUserNameAvailabilityCommandConfig")
-	private SimpleProducerConfig CheckUserNameAvailabilityCommandConfig;
+	private SimpleProducerConfig simpleProducerConfig;	
 	
 	@Autowired
-	private SimpleBackgammonCommandsProducer<CheckUserEmailAvailabilityCommand> simpleCheckUserEmailAvailabilityCommandProducer;
+	private SimpleCommandsProducer<CheckUserNameAvailabilityCommand> simpleCheckUserNameAvailabilityCommandProducer;
 	
-	@Resource(name = "CheckUserEmailAvailabilityConfig")
-	private SimpleProducerConfig checkUserEmailAvailabilityConfig;
+	@Autowired
+	private SimpleCommandsProducer<CheckUserEmailAvailabilityCommand> simpleCheckUserEmailAvailabilityCommandProducer;
 	
 	@Autowired
 	private EventsPollFromConsumerToFrontService eventsPollFromConsumerToFrontService;	
 	
 	public boolean isUserNameAvailable(UserNameMessage userNameMessage){
 		UUID uuidEvent;
-		simpleCheckUserNameAvailabilityCommandProducer.setSimpleProducerConfig(CheckUserNameAvailabilityCommandConfig);
+		simpleCheckUserNameAvailabilityCommandProducer.setSimpleProducerConfig(simpleProducerConfig);
 		simpleCheckUserNameAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC);
 		CheckUserNameAvailabilityCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameAvailabilityCommand.class);			
 		uuidEvent = UUID.randomUUID();
@@ -84,7 +78,7 @@ public class HomeService implements ApplicationContextAware {
 	
 	public boolean isEmailAvailable(EmailMessage emailMessage){
 		UUID uuidEvent;
-		simpleCheckUserEmailAvailabilityCommandProducer.setSimpleProducerConfig(checkUserEmailAvailabilityConfig);
+		simpleCheckUserEmailAvailabilityCommandProducer.setSimpleProducerConfig(simpleProducerConfig);
 		simpleCheckUserEmailAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_EMAIL_AVAILABILITY_COMMAND_TOPIC);		
 		CheckUserEmailAvailabilityCommand checkUserEmailAvailabilityCommand = context.getBean(CheckUserEmailAvailabilityCommand.class);			
 		uuidEvent = UUID.randomUUID();
@@ -107,7 +101,7 @@ public class HomeService implements ApplicationContextAware {
 	}
 	
 	public void createNewUser(BackgammonUser backgammonUser){
-		simpleCreateNewUserCommandProducer.setSimpleProducerConfig(createNewUserCommandConfig);
+		simpleCreateNewUserCommandProducer.setSimpleProducerConfig(simpleProducerConfig);
 		simpleCreateNewUserCommandProducer.setTopic(KafkaUtils.CREATE_NEW_USER_COMMAND_TOPIC);
 		CreateNewUserCommand createNewUserCommand = context.getBean(CreateNewUserCommand.class);
 		createNewUserCommand.setUuid(UUID.randomUUID());

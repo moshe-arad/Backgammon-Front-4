@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component("CreateNewUserCommand")
 @Scope("prototype")
-public class CreateNewUserCommand implements Commandable{
+public class CreateNewUserCommand implements ICommand{
 
 	private UUID uuid;
 	private BackgammonUser backgammonUser;

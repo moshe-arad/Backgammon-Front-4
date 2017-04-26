@@ -18,6 +18,7 @@ public class Application implements ApplicationRunner {
 	@Autowired
 	private AppInit appInit;
 	
+	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
@@ -33,6 +34,7 @@ public class Application implements ApplicationRunner {
 	public ResponseEntity<String> shutdown(){		
 		return this.doShutdown();
 	}
+	
 	
 	
 	private ResponseEntity<String> doShutdown(){

@@ -3,12 +3,14 @@ package org.moshe.arad.kafka.producers;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.moshe.arad.kafka.commands.Commandable;
-import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
+import org.moshe.arad.kafka.commands.ICommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * 
  * @author moshe-arad
@@ -19,18 +21,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("prototype")
-public class SimpleBackgammonCommandsProducer <T extends Commandable> implements SimpleProducer<T> {
+public class SimpleCommandsProducer <T extends ICommand> implements ISimpleProducer<T> {
 
-	private final Logger logger = LoggerFactory.getLogger(SimpleBackgammonCommandsProducer.class);
+	private final Logger logger = LoggerFactory.getLogger(SimpleCommandsProducer.class);
 	private SimpleProducerConfig simpleProducerConfig;
 	private String topic;
 	
-//	public SimpleBackgammonCommandsProducer(SimpleProducerConfig simpleProducerConfig, String topic) {
-//		this.simpleProducerConfig = simpleProducerConfig;
-//		this.topic = topic;
-//	}
-	
-	public SimpleBackgammonCommandsProducer() {
+	public SimpleCommandsProducer() {
 	}
 	
 	@Override
@@ -49,17 +46,31 @@ public class SimpleBackgammonCommandsProducer <T extends Commandable> implements
 	
 	private void sendMessage(T command){
 		logger.info("Creating kafka producer.");
-		Producer<String, T> producer = new KafkaProducer<>(simpleProducerConfig.getProperties());
+		Producer<String, String> producer = new KafkaProducer<>(simpleProducerConfig.getProperties());
 		logger.info("Kafka producer created.");
 		
 		logger.info("Sending message to topic = " + topic + ", message = " + command.toString() + ".");
-		ProducerRecord<String, T> record = new ProducerRecord<String, T>(topic, command);
+		String commandJsonBlob = convertCommandIntoJsonBlob(command);
+		logger.info("Sending message to topic = " + topic + ", JSON message = " + commandJsonBlob + ".");
+		ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, commandJsonBlob);
 		producer.send(record);
 		logger.info("Message sent.");
 		producer.close();
 		logger.info("Kafka producer closed.");
 	}
 
+	private String convertCommandIntoJsonBlob(T command){
+		ObjectMapper objectMapper = new ObjectMapper();		
+		try {
+			return objectMapper.writeValueAsString(command);
+		} catch (JsonProcessingException e) {
+			logger.error("Failed to convert command into JSON blob...");
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public SimpleProducerConfig getSimpleProducerConfig() {
 		return simpleProducerConfig;
 	}

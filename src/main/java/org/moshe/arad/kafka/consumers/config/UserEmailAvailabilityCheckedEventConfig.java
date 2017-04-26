@@ -9,6 +9,5 @@ public class UserEmailAvailabilityCheckedEventConfig extends SimpleConsumerConfi
 	public UserEmailAvailabilityCheckedEventConfig() {
 		super();
 		super.getProperties().put("group.id", KafkaUtils.USER_EMAIL_AVAILABILITY_CHECKED_EVENT_GROUP);
-		super.getProperties().put("value.deserializer", KafkaUtils.USER_EMAIL_AVAILABILITY_CHECKED_EVENT_DESERIALIZER);
 	}
 }

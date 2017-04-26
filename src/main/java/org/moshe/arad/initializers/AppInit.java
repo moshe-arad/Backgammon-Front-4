@@ -8,9 +8,9 @@ import java.util.concurrent.Executors;
 import javax.annotation.Resource;
 
 import org.moshe.arad.kafka.KafkaUtils;
-import org.moshe.arad.kafka.consumers.SimpleConsumer;
+import org.moshe.arad.kafka.consumers.ISimpleConsumer;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
-import org.moshe.arad.kafka.consumers.events.SimpleBackgammonEventsConsumer;
+import org.moshe.arad.kafka.consumers.events.SimpleEventsConsumer;
 import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
 import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
 import org.slf4j.Logger;
@@ -18,16 +18,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppInit implements AppInitializer {
+public class AppInit implements IAppInitializer {
 	
 	@Resource(name = "UserNameAvailabilityCheckedEventConsumer")
-	private SimpleBackgammonEventsConsumer<UserNameAvailabilityCheckedEvent> userNameAvailabilityCheckedEventConsumer;
+	private SimpleEventsConsumer userNameAvailabilityCheckedEventConsumer;
 	
 	@Resource(name = "UserNameAvailabilityCheckedEventConfig")
 	private SimpleConsumerConfig userNameAvailabilityCheckedEventConfig;
 	
 	@Resource(name = "UserEmailAvailabilityCheckedEventConsumer")
-	private SimpleBackgammonEventsConsumer<UserEmailAvailabilityCheckedEvent> userEmailAvailabilityCheckedEventConsumer;
+	private SimpleEventsConsumer userEmailAvailabilityCheckedEventConsumer;
 	
 	@Resource(name = "UserEmailAvailabilityCheckedEventConfig")
 	private SimpleConsumerConfig userEamilAvailabilityCheckedEventConfig;
@@ -78,13 +78,13 @@ public class AppInit implements AppInitializer {
 		
 	}
 	
-	private void initSingleConsumer(SimpleConsumer consumer, String topic, SimpleConsumerConfig consumerConfig) {
+	private void initSingleConsumer(ISimpleConsumer consumer, String topic, SimpleConsumerConfig consumerConfig) {
 		consumer.setTopic(topic);
 		consumer.setSimpleConsumerConfig(consumerConfig);
 		consumer.initConsumer();	
 	}
 	
-	private void shutdownSingleConsumer(SimpleConsumer consumer) {
+	private void shutdownSingleConsumer(ISimpleConsumer consumer) {
 		consumer.setRunning(false);
 		consumer.getScheduledExecutor().shutdown();	
 	}

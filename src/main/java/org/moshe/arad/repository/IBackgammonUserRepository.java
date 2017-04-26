@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BackgammonUserRepository extends JpaRepository<BackgammonUser,Long>{
+public interface IBackgammonUserRepository extends JpaRepository<BackgammonUser,Long>{
 
 	public BackgammonUser findByUserName(String UserName); 
 }

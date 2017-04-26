@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component("CheckUserEmailAvailabilityCommand")
-public class CheckUserEmailAvailabilityCommand implements Commandable {
+public class CheckUserEmailAvailabilityCommand implements ICommand {
 
 	private UUID uuid;
 	private String email;

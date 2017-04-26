@@ -1,5 +1,5 @@
 package org.moshe.arad.kafka.commands;
 
-public interface Commandable {
+public interface ICommand {
 
 }
