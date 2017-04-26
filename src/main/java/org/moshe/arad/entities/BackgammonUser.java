@@ -2,8 +2,6 @@ package org.moshe.arad.entities;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,8 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
@@ -27,6 +23,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="users")
@@ -50,6 +48,7 @@ public class BackgammonUser implements UserDetails{
 	private String password;
 	
 	@NotNull
+	@JsonIgnore
 	private Boolean enabled;
 	
 	@NotBlank
@@ -67,21 +66,25 @@ public class BackgammonUser implements UserDetails{
 	@Column(name="last_modified_date")
 	@NotNull
 	@LastModifiedDate
+	@JsonIgnore
 	private Date lastModifiedDate;
 	
 	@Column(name="last_modified_by")
 	@NotNull
 	@LastModifiedBy
+	@JsonIgnore
 	private String lastModifiedBy;
 	
 	@Column(name="created_date")
 	@NotNull
 	@CreatedDate
+	@JsonIgnore
 	private Date createdDate;
 	
 	@Column(name="created_by")
 	@NotNull
 	@CreatedBy
+	@JsonIgnore
 	private String createdBy;
 
 	public BackgammonUser() {
@@ -188,31 +191,37 @@ public class BackgammonUser implements UserDetails{
 	}
 
 	@Override
+	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return AuthorityUtils.createAuthorityList("Backgammon_User");
 	}
 
 	@Override
+	@JsonIgnore
 	public String getUsername() {
 		return userName;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isEnabled() {
 		return true;
 	}

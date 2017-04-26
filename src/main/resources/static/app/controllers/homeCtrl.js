@@ -83,21 +83,6 @@
 		
 		var isPassedValidation = function(){
 			
-//			var firstName = isValidName($scope.user.firstName);
-//			var lastName = isValidName($scope.user.lastName);
-//			var email = checkValidEmail();
-//	
-//			var userName = checkUserNameValid($scope.user.userName);
-//			var password = isValidPassword($scope.user.password) == "valid" ? true:false;
-//			var passwordMatch = $scope.user.confirm == $scope.user.password ? true:false; 
-//			
-//			if(!Boolean(firstName)) return "First name didn't passed validation";
-//			if(!Boolean(lastName)) return "Last name didn't passed validation";
-//			if(!Boolean(email)) return "Email didn't passed validation";
-//			if(!Boolean(userName)) return "User name didn't passed validation";
-//			if(!Boolean(password)) return "password didn't passed validation";
-//			if(!Boolean(passwordMatch)) return "password Match didn't passed validation";
-			
 			isFirstNamePassedValidation = isValidName($scope.user.firstName); 
 			isLastNamePassedValidation = isValidName($scope.user.lastName);
 			var password = isValidPassword($scope.user.password) == "valid" ? true:false;

@@ -13,8 +13,9 @@ public class UserNameAvailabilityCheckedEvent extends BackgammonEvent{
 	public UserNameAvailabilityCheckedEvent() {
 	}
 
-	public UserNameAvailabilityCheckedEvent(UUID uuid, int serviceId, int eventId, Date arrived, boolean isAvailable) {
-		super(uuid, serviceId, eventId, arrived);
+	public UserNameAvailabilityCheckedEvent(UUID uuid, int serviceId, int eventId, Date arrived, String clazz,
+			boolean isAvailable) {
+		super(uuid, serviceId, eventId, arrived, clazz);
 		this.isAvailable = isAvailable;
 	}
 
