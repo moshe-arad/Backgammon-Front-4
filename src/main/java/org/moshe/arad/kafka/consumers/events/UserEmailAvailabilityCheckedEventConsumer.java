@@ -4,9 +4,7 @@ import java.io.IOException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
-import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
-import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
 import org.moshe.arad.services.HomeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +19,7 @@ public class UserEmailAvailabilityCheckedEventConsumer extends SimpleEventsConsu
 	@Autowired
 	private HomeService homeService;
 	
-	Logger logger = LoggerFactory.getLogger(UserEmailAvailabilityCheckedEventConsumer.class);
+	private Logger logger = LoggerFactory.getLogger(UserEmailAvailabilityCheckedEventConsumer.class);
 	
 	public UserEmailAvailabilityCheckedEventConsumer() {
 	}

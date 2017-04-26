@@ -9,6 +9,5 @@ public class UserNameAvailabilityCheckedEventConfig extends SimpleConsumerConfig
 	public UserNameAvailabilityCheckedEventConfig() {
 		super();
 		super.getProperties().put("group.id", KafkaUtils.USER_NAME_AVAILABILITY_CHECKED_EVENT_GROUP);
-		super.getProperties().put("value.deserializer", KafkaUtils.USER_NAME_AVAILABILITY_CHECKED_EVENT_DESERIALIZER);
 	}
 }
