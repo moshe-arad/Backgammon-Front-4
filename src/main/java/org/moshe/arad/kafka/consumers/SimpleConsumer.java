@@ -1,0 +1,18 @@
+package org.moshe.arad.kafka.consumers;
+
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
+import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
+
+public interface SimpleConsumer {
+
+	public void setTopic(String topic);
+	
+	public void setSimpleConsumerConfig(SimpleConsumerConfig simpleConsumerConfig);
+	
+	public void initConsumer();
+	
+	public void setRunning(boolean isRunning);
+	
+	public ScheduledThreadPoolExecutor getScheduledExecutor();
+}

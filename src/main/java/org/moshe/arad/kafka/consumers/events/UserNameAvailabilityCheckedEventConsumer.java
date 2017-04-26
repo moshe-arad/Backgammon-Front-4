@@ -1,6 +1,7 @@
 package org.moshe.arad.kafka.consumers.events;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.moshe.arad.kafka.consumers.SimpleConsumer;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
 import org.moshe.arad.services.HomeService;
@@ -10,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component("UserNameAvailabilityCheckedEventConsumer")
-public class UserNameAvailabilityCheckedEventConsumer extends SimpleBackgammonEventsConsumer<UserNameAvailabilityCheckedEvent> {
+public class UserNameAvailabilityCheckedEventConsumer extends SimpleBackgammonEventsConsumer<UserNameAvailabilityCheckedEvent> implements SimpleConsumer {
 
 	@Autowired
 	private HomeService homeService;

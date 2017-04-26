@@ -1,5 +1,6 @@
 package org.moshe.arad;
 
+import org.moshe.arad.initializers.AppInit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +11,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 public class Application implements ApplicationRunner {
 	
 	@Autowired
-	private AppInit AppInit;
+	private AppInit appInit;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -26,14 +26,19 @@ public class Application implements ApplicationRunner {
 	
 	@Override
 	public void run(ApplicationArguments arg0) throws Exception {
-		AppInit.acceptNewEvents();
+		appInit.startEngine();
 	}
 	
 	@RequestMapping("/shutdown")
-	public ResponseEntity<String> shutdown(){
+	public ResponseEntity<String> shutdown(){		
+		return this.doShutdown();
+	}
+	
+	
+	private ResponseEntity<String> doShutdown(){
 		try{
 			logger.info("about to do shutdown.");
-			AppInit.shutdown();
+			appInit.engineShutdown();
 			logger.info("shutdown compeleted.");
 			return new ResponseEntity<String>("", HttpStatus.OK);
 		}
@@ -41,6 +46,5 @@ public class Application implements ApplicationRunner {
 			logger.info("Failed to shutdown users service.");
 			return new ResponseEntity<String>("", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 	}
 }

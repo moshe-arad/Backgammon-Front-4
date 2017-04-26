@@ -9,6 +9,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.moshe.arad.kafka.consumers.SimpleConsumer;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.events.BackgammonEvent;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * 
  * important to set properties and topic before usage
  */
-public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent> implements Runnable {
+public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent> implements Runnable, SimpleConsumer {
 
 	Logger logger = LoggerFactory.getLogger(SimpleBackgammonEventsConsumer.class);
 	private static final int CONSUMERS_NUM = 3;
@@ -70,6 +71,7 @@ public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent>
 		}
 	}
 	
+	@Override
 	public void initConsumer() {
 		consumer = new KafkaConsumer<String,T>(simpleConsumerConfig.getProperties());
 	}
@@ -85,10 +87,12 @@ public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent>
 		return isRunning;
 	}
 
+	@Override
 	public void setRunning(boolean isRunning) {
 		this.isRunning = isRunning;
 	}
 	
+	@Override
 	public ScheduledThreadPoolExecutor getScheduledExecutor() {
 		return scheduledExecutor;
 	}
@@ -97,6 +101,7 @@ public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent>
 		return topic;
 	}
 
+	@Override
 	public void setTopic(String topic) {
 		this.topic = topic;
 	}
@@ -105,6 +110,7 @@ public abstract class SimpleBackgammonEventsConsumer <T extends BackgammonEvent>
 		return simpleConsumerConfig;
 	}
 
+	@Override
 	public void setSimpleConsumerConfig(SimpleConsumerConfig simpleConsumerConfig) {
 		this.simpleConsumerConfig = simpleConsumerConfig;
 	}	
