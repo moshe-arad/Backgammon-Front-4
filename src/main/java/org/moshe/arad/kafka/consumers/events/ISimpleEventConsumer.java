@@ -21,4 +21,7 @@ public interface ISimpleEventConsumer extends ISimpleConsumer {
 	
 	@Override
 	public ScheduledThreadPoolExecutor getScheduledExecutor();
+
+	@Override
+	public void closeConsumer();
 }

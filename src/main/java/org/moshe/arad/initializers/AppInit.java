@@ -10,24 +10,24 @@ import javax.annotation.Resource;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
-import org.moshe.arad.kafka.consumers.events.SimpleEventsConsumer;
-import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
-import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
+import org.moshe.arad.kafka.consumers.events.UserEmailAvailabilityCheckedEventConsumer;
+import org.moshe.arad.kafka.consumers.events.UserNameAvailabilityCheckedEventConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AppInit implements IAppInitializer {
 	
-	@Resource(name = "UserNameAvailabilityCheckedEventConsumer")
-	private SimpleEventsConsumer userNameAvailabilityCheckedEventConsumer;
+	@Autowired
+	private UserNameAvailabilityCheckedEventConsumer userNameAvailabilityCheckedEventConsumer;
 	
 	@Resource(name = "UserNameAvailabilityCheckedEventConfig")
 	private SimpleConsumerConfig userNameAvailabilityCheckedEventConfig;
 	
-	@Resource(name = "UserEmailAvailabilityCheckedEventConsumer")
-	private SimpleEventsConsumer userEmailAvailabilityCheckedEventConsumer;
+	@Autowired
+	private UserEmailAvailabilityCheckedEventConsumer userEmailAvailabilityCheckedEventConsumer;
 	
 	@Resource(name = "UserEmailAvailabilityCheckedEventConfig")
 	private SimpleConsumerConfig userEamilAvailabilityCheckedEventConfig;
@@ -55,7 +55,7 @@ public class AppInit implements IAppInitializer {
 		initSingleConsumer(userEmailAvailabilityCheckedEventConsumer, KafkaUtils.EMAIL_AVAILABILITY_CHECKED_EVENT_TOPIC, userEamilAvailabilityCheckedEventConfig);				
 		logger.info("Initialize user email avialability checked event consumer, completed...");
 
-		executeProducersAndConsumers(Arrays.asList(userNameAvailabilityCheckedEventConsumer, userEmailAvailabilityCheckedEventConsumer));
+		executeProducersAndConsumers(Arrays.asList(userEmailAvailabilityCheckedEventConsumer,userNameAvailabilityCheckedEventConsumer));
 	}	
 
 	@Override
@@ -86,7 +86,8 @@ public class AppInit implements IAppInitializer {
 	
 	private void shutdownSingleConsumer(ISimpleConsumer consumer) {
 		consumer.setRunning(false);
-		consumer.getScheduledExecutor().shutdown();	
+		consumer.getScheduledExecutor().shutdown();
+		consumer.closeConsumer();
 	}
 	
 	private void selfShutdown(){
