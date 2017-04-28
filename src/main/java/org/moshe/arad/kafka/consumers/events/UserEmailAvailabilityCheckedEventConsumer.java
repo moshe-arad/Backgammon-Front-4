@@ -9,11 +9,13 @@ import org.moshe.arad.services.HomeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component("UserEmailAvailabilityCheckedEventConsumer")
+@Scope("prototype")
 public class UserEmailAvailabilityCheckedEventConsumer extends SimpleEventsConsumer implements ISimpleConsumer {
 
 	@Autowired
