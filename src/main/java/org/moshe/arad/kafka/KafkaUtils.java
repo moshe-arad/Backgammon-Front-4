@@ -21,4 +21,6 @@ public class KafkaUtils {
 	public static final String USER_EMAIL_AVAILABILITY_CHECKED_EVENT_GROUP = "UserEmailAvailabilityCheckedEventGroup";
 	public static final String USER_EMAIL_AVAILABILITY_CHECKED_EVENT_DESERIALIZER = "org.moshe.arad.kafka.deserializers.UserEmailAvailabilityCheckedEventDeserializer";
 	public static final String EMAIL_AVAILABILITY_CHECKED_EVENT_TOPIC = "Email-Availability-Checked-Event";
+	public static final String NEW_USER_CREATED_ACK_EVENT_GROUP = "NewUserCreatedAckEventGroup";
+	public static final String NEW_USER_CREATED_ACK_EVENT_TOPIC = "New-User-Created-Ack-Event";
 }

@@ -30,11 +30,11 @@ public class UserNameAvailabilityCheckedEventConsumer extends SimpleEventsConsum
 	public void consumerOperations(ConsumerRecord<String,String> record) {
 		UserNameAvailabilityCheckedEvent userNameAvailabilityCheckedEvent = convertJsonBlobIntoEvent(record.value());
 		
-		Object locker = homeService.getEventsPollFromConsumerToFrontService().getUserNamesMesaageLoockers().get(userNameAvailabilityCheckedEvent.getUuid().toString());
+		Object locker = homeService.getEventsPoll().getUserNamesLockers().get(userNameAvailabilityCheckedEvent.getUuid().toString());
 		synchronized (locker) {
 			logger.info("User Name Availability Checked Event record recieved, " + record.value());
 			logger.info("passing event to home service queue...");
-			homeService.getEventsPollFromConsumerToFrontService().addEventToPool(userNameAvailabilityCheckedEvent);
+			homeService.getEventsPoll().addEventToPool(userNameAvailabilityCheckedEvent);
 			logger.info("User Name Availability Checked Event record passed to home service...");
 			locker.notifyAll();
 		}			

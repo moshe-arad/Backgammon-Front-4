@@ -5,19 +5,18 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component("CheckUserNameAvailabilityCommand")
-public class CheckUserNameAvailabilityCommand implements ICommand {
+public class CheckUserNameAvailabilityCommand extends Command {
 
-	private UUID uuid;
 	private String userName;
-
+	
 	public CheckUserNameAvailabilityCommand() {
 	}
 	
 	public CheckUserNameAvailabilityCommand(UUID uuid, String userName) {
+		super(uuid);
 		this.userName = userName;
-		this.uuid = uuid;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "CheckUserNameAvailabilityCommand [userName =" + userName + "]";
@@ -31,11 +30,4 @@ public class CheckUserNameAvailabilityCommand implements ICommand {
 		this.userName = userName;
 	}
 
-	public UUID getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(UUID uuid) {
-		this.uuid = uuid;
-	}
 }

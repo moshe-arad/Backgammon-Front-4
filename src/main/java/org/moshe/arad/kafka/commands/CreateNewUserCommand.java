@@ -8,20 +8,18 @@ import org.springframework.stereotype.Component;
 
 @Component("CreateNewUserCommand")
 @Scope("prototype")
-public class CreateNewUserCommand implements ICommand{
+public class CreateNewUserCommand extends Command{
 
-	private UUID uuid;
 	private BackgammonUser backgammonUser;
 	
 	public CreateNewUserCommand() {
 	}
-
+	
 	public CreateNewUserCommand(UUID uuid, BackgammonUser backgammonUser) {
-		super();
-		this.uuid = uuid;
+		super(uuid);
 		this.backgammonUser = backgammonUser;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "CreateNewUserCommand [backgammonUser=" + backgammonUser + "]";
@@ -35,11 +33,4 @@ public class CreateNewUserCommand implements ICommand{
 		this.backgammonUser = backgammonUser;
 	}
 
-	public UUID getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(UUID uuid) {
-		this.uuid = uuid;
-	}
 }

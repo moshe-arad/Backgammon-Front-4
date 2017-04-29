@@ -12,15 +12,22 @@ import org.moshe.arad.websocket.EmailMessage;
 import org.moshe.arad.websocket.UserNameMessage;
 import org.springframework.stereotype.Component;
 
+/**
+ * 
+ * @author moshe-arad
+ *
+ * From Consumer To Front Service
+ */
 @Component
-public class EventsPollFromConsumerToFrontService {
+public class EventsPool {
 
 	private static final int POLL_SIZE = 100000;
 	private static final int SLEEP = 100;
 	private Set<BackgammonEvent> events = new HashSet<>(POLL_SIZE);
 	
-	private Map<String, UserNameMessage> userNamesMesaageLoockers = new HashMap<>(POLL_SIZE);
-	private Map<String, EmailMessage> userEmailsMesaageLoockers = new HashMap<>(POLL_SIZE);
+	private Map<String, Thread> userNamesLockers = new HashMap<>(POLL_SIZE);
+	private Map<String, Thread> emailsLockers = new HashMap<>(POLL_SIZE);
+	private Map<String, Thread> createUserLockers = new HashMap<>(POLL_SIZE);
 	
 	public boolean addEventToPool(BackgammonEvent event){
 		return events.add(event);
@@ -67,19 +74,27 @@ public class EventsPollFromConsumerToFrontService {
 		else return null;
 	}
 
-	public Map<String, UserNameMessage> getUserNamesMesaageLoockers() {
-		return userNamesMesaageLoockers;
+	public Map<String, Thread> getUserNamesLockers() {
+		return userNamesLockers;
 	}
 
-	public void setUserNamesMesaageLoockers(Map<String, UserNameMessage> userNamesMesaageLoockers) {
-		this.userNamesMesaageLoockers = userNamesMesaageLoockers;
+	public void setUserNamesLockers(Map<String, Thread> userNamesLockers) {
+		this.userNamesLockers = userNamesLockers;
 	}
 
-	public Map<String, EmailMessage> getUserEmailsMesaageLoockers() {
-		return userEmailsMesaageLoockers;
+	public Map<String, Thread> getEmailsLockers() {
+		return emailsLockers;
 	}
 
-	public void setUserEmailsMesaageLoockers(Map<String, EmailMessage> userEmailsMesaageLoockers) {
-		this.userEmailsMesaageLoockers = userEmailsMesaageLoockers;
+	public void setEmailsLockers(Map<String, Thread> emailsLockers) {
+		this.emailsLockers = emailsLockers;
+	}
+
+	public Map<String, Thread> getCreateUserLockers() {
+		return createUserLockers;
+	}
+
+	public void setCreateUserLockers(Map<String, Thread> createUserLockers) {
+		this.createUserLockers = createUserLockers;
 	}
 }

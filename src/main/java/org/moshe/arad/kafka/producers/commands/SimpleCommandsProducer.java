@@ -1,13 +1,15 @@
 package org.moshe.arad.kafka.producers.commands;
 
+import java.util.UUID;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.moshe.arad.kafka.commands.ICommand;
-import org.moshe.arad.kafka.producers.ISimpleProducer;
 import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -19,37 +21,48 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @param <T> is the event that we want to pass
  * 
- * important to set topic and properties before usage
+ * important to set topic 
+ * 
+ * Command producer will always generate a UUID
  */
 @Component
 @Scope("prototype")
 public class SimpleCommandsProducer <T extends ICommand> implements ISimpleCommandProducer<T> {
 
-	private final Logger logger = LoggerFactory.getLogger(SimpleCommandsProducer.class);
+	@Autowired
 	private SimpleProducerConfig simpleProducerConfig;
+	
+	private final Logger logger = LoggerFactory.getLogger(SimpleCommandsProducer.class);
 	private String topic;
 	
 	public SimpleCommandsProducer() {
 	}
 	
 	@Override
-    public void sendKafkaMessage(T command){
+    public UUID sendKafkaMessage(T command){
 		try{
 			logger.info("Front Service is about to send a Command to topic=" + topic + ", Command=" + command);
-			sendMessage(command);
+			UUID uuid = sendMessage(command);
 			logger.info("Message sent successfully, Front Service sent a Command to topic=" + topic + ", Command=" + command);
+			return uuid;
 		}
 		catch(Exception ex){
 			logger.error("Failed to sent message, Front Service failed to send a Command to topic=" + topic + ", Command=" + command);
 			logger.error(ex.getMessage());
 			ex.printStackTrace();
 		}
+		return null;
 	}
 	
-	private void sendMessage(T command){
+	private UUID sendMessage(T command){
 		logger.info("Creating kafka producer.");
 		Producer<String, String> producer = new KafkaProducer<>(simpleProducerConfig.getProperties());
 		logger.info("Kafka producer created.");
+		
+		logger.info("Generating UUID...");
+		UUID uuid = generateUUID();
+		logger.info("UUID was generated, uuid = " + uuid);
+		command.setUuid(uuid);
 		
 		logger.info("Sending message to topic = " + topic + ", message = " + command.toString() + ".");
 		String commandJsonBlob = convertCommandIntoJsonBlob(command);
@@ -59,6 +72,8 @@ public class SimpleCommandsProducer <T extends ICommand> implements ISimpleComma
 		logger.info("Message sent.");
 		producer.close();
 		logger.info("Kafka producer closed.");
+		
+		return uuid;
 	}
 
 	private String convertCommandIntoJsonBlob(T command){
@@ -77,6 +92,7 @@ public class SimpleCommandsProducer <T extends ICommand> implements ISimpleComma
 		return simpleProducerConfig;
 	}
 
+	@Deprecated
 	public void setSimpleProducerConfig(SimpleProducerConfig simpleProducerConfig) {
 		this.simpleProducerConfig = simpleProducerConfig;
 	}

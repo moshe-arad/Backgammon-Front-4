@@ -70,7 +70,10 @@
 					$rootScope.credentials = {username:data.userName};
 					console.log("Navigating to lobby");
 					$location.path("/lobby");	
-				} 
+				}
+				else if(status == 200){
+					$scope.register_error = "This User already exists in system, try to do LogIn..."
+				}
 				else if(status == 500){
 					console.log("Registeration failure");
 					$scope.register_error = "Failed to do registration."

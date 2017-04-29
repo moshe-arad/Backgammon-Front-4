@@ -60,12 +60,19 @@ public class UsersController {
 		
 		try{
 			
-			homeService.createNewUser(backgammonUser);
+			boolean isCreated = homeService.createNewUser(backgammonUser);
 			
-			HttpHeaders header = new HttpHeaders();
-			header.add("Content-Type", "application/json");
-			ObjectMapper mapper = new ObjectMapper();
-			return new ResponseEntity<String>(mapper.writeValueAsString(backgammonUser), header, HttpStatus.CREATED);
+			if(isCreated){
+				HttpHeaders header = new HttpHeaders();
+				header.add("Content-Type", "application/json");
+				ObjectMapper mapper = new ObjectMapper();
+				return new ResponseEntity<String>(mapper.writeValueAsString(backgammonUser), header, HttpStatus.CREATED);
+			}
+			else{
+				HttpHeaders header = new HttpHeaders();
+				header.add("Content-Type", "application/json");
+				return new ResponseEntity<String>(header, HttpStatus.OK);
+			}
 		}
 		catch(Exception ex){
 			logger.info("User register failed.");

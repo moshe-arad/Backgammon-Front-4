@@ -29,13 +29,13 @@ public class UserEmailAvailabilityCheckedEventConsumer extends SimpleEventsConsu
 	@Override
 	public void consumerOperations(ConsumerRecord<String,String> record) {
 		UserEmailAvailabilityCheckedEvent userEmailAvailabilityCheckedEvent = convertJsonBlobIntoEvent(record.value());
-		Object locker = homeService.getEventsPollFromConsumerToFrontService().getUserEmailsMesaageLoockers().get(userEmailAvailabilityCheckedEvent.getUuid().toString());
+		Object locker = homeService.getEventsPoll().getEmailsLockers().get(userEmailAvailabilityCheckedEvent.getUuid().toString());
 		
 		if(locker!= null){
 			synchronized (locker) {
 				logger.info("User Email Availability Checked Event record recieved, " + record.value());
 				logger.info("passing event to home service queue...");
-				homeService.getEventsPollFromConsumerToFrontService().addEventToPool(userEmailAvailabilityCheckedEvent);
+				homeService.getEventsPoll().addEventToPool(userEmailAvailabilityCheckedEvent);
 				logger.info("User Email Availability Checked Event record passed to home service...");
 				locker.notifyAll();
 			}
