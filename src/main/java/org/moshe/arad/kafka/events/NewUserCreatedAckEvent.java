@@ -7,6 +7,10 @@ public class NewUserCreatedAckEvent extends BackgammonEvent {
 
 	private boolean isUserCreated;
 
+	public NewUserCreatedAckEvent() {
+	
+	}
+	
 	public NewUserCreatedAckEvent(UUID uuid, int serviceId, int eventId, Date arrived, String clazz,
 			boolean isUserCreated) {
 		super(uuid, serviceId, eventId, arrived, clazz);
