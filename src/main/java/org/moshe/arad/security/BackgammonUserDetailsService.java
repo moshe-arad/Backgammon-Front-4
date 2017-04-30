@@ -1,6 +1,6 @@
 package org.moshe.arad.security;
 
-import org.moshe.arad.repository.BackgammonUserRepository;
+import org.moshe.arad.repository.IBackgammonUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class BackgammonUserDetailsService implements UserDetailsService{
 
 	@Autowired
-	private BackgammonUserRepository backgammonUserRepository;
+	private IBackgammonUserRepository backgammonUserRepository;
 	
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {

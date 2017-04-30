@@ -3,17 +3,20 @@ package org.moshe.arad.controllers;
 import javax.validation.Valid;
 
 import org.moshe.arad.entities.BackgammonUser;
-import org.moshe.arad.kafka.KafkaUtils;
-import org.moshe.arad.kafka.commands.CreateNewUserCommand;
-import org.moshe.arad.kafka.producers.SimpleProducer;
 import org.moshe.arad.services.HomeService;
 import org.moshe.arad.validators.BackgammonUserValidator;
+import org.moshe.arad.websocket.EmailAvailabilityMessage;
+import org.moshe.arad.websocket.EmailMessage;
+import org.moshe.arad.websocket.UserNameAvailabilityMessage;
+import org.moshe.arad.websocket.UserNameMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
@@ -27,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-@RequestMapping(value = "/users")
 public class UsersController {
 	
 	private final Logger logger = LoggerFactory.getLogger(UsersController.class);
@@ -35,10 +37,7 @@ public class UsersController {
 	@Autowired
 	private HomeService homeService;
 	
-	@Autowired
-	private SimpleProducer<CreateNewUserCommand> simpleProducer;
-	
-	@RequestMapping(value = "/", method = RequestMethod.POST)
+	@RequestMapping(value = "/users/", method = RequestMethod.POST)
 	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUser backgammonUser, Errors errors){
 		if(errors.hasErrors()){
 			logger.info("Some errors occured while trying to bind backgammon user");
@@ -60,15 +59,20 @@ public class UsersController {
 		logger.info("The GameUser bind result: " + backgammonUser);
 		
 		try{
-			homeService.registerNewUser(backgammonUser);
 			
-			CreateNewUserCommand createNewUserCommand = new CreateNewUserCommand(backgammonUser);
-			simpleProducer.sendKafkaMessage(KafkaUtils.COMMANDS_TO_USERS_SERVICE_TOPIC, createNewUserCommand);
+			boolean isCreated = homeService.createNewUser(backgammonUser);
 			
-			HttpHeaders header = new HttpHeaders();
-			header.add("Content-Type", "application/json");
-			ObjectMapper mapper = new ObjectMapper();
-			return new ResponseEntity<String>(mapper.writeValueAsString(backgammonUser), header, HttpStatus.CREATED);
+			if(isCreated){
+				HttpHeaders header = new HttpHeaders();
+				header.add("Content-Type", "application/json");
+				ObjectMapper mapper = new ObjectMapper();
+				return new ResponseEntity<String>(mapper.writeValueAsString(backgammonUser), header, HttpStatus.CREATED);
+			}
+			else{
+				HttpHeaders header = new HttpHeaders();
+				header.add("Content-Type", "application/json");
+				return new ResponseEntity<String>(header, HttpStatus.OK);
+			}
 		}
 		catch(Exception ex){
 			logger.info("User register failed.");
@@ -81,56 +85,41 @@ public class UsersController {
 		}
 	}
 	
-	@RequestMapping(value = "/user_name/{userName}", method = RequestMethod.GET)
-	public ResponseEntity<String> isUserNameAvailable(@PathVariable String userName){
+	@MessageMapping("/users/user_name/")
+	@SendTo("/frontEndPoint/user_name")
+	public UserNameAvailabilityMessage isUserNameAvailable(UserNameMessage userNameMessage){
+		boolean isAvailable = false;
+		
 		try{
-			logger.info("User name bind result: " + userName);
-			if(homeService.isUserNameAvailable(userName)){
-				logger.info("User name available for registeration.");
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "text/html");
-				return new ResponseEntity<String>("", headers,HttpStatus.OK);
-				
-			}
-			else {
-				logger.info("User name not available can't register.");
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "text/html");
-				return new ResponseEntity<String>("User name is not available.", headers,HttpStatus.OK);
-			}
+			logger.info("User name bind result: " + userNameMessage);
+			isAvailable = homeService.isUserNameAvailable(userNameMessage);
+			if(isAvailable) logger.info("User name available for registeration.");
+			else logger.info("User name not available can't register."); 				
+			return new UserNameAvailabilityMessage(isAvailable);
 		}
 		catch (Exception ex) {
 			logger.error(ex.getMessage());
 			logger.error(ex.toString());
-			HttpHeaders headers = new HttpHeaders();
-			headers.add("Content-Type", "text/html");
-			return new ResponseEntity<String>("Ajax call encountred a server error.", headers,HttpStatus.INTERNAL_SERVER_ERROR);
+			return new UserNameAvailabilityMessage(false);
 		}
 	}
 	
-	@RequestMapping(value = "/email/{email}/", method = RequestMethod.GET)
-	public ResponseEntity<String> isUserEmailAvailable(@PathVariable String email){
+	@MessageMapping("/users/email/")
+	@SendTo("/frontEndPoint/email")
+	public EmailAvailabilityMessage isUserEmailAvailable(EmailMessage emailMessage){
+		boolean isAvailable = false;
+		
 		try{
-			logger.info("Email bind result: " + email);
-			if(homeService.isEmailAvailable(email)){
-				logger.info("Email available for registeration.");
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "text/html");
-				return new ResponseEntity<>("", headers, HttpStatus.OK);
-			}
-			else{
-				logger.info("Email not available can't register.");
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "text/html");
-				return new ResponseEntity<>("Email is not available.", headers, HttpStatus.OK);
-			}
+			logger.info("Email bind result: " + emailMessage);
+			isAvailable = homeService.isEmailAvailable(emailMessage);
+			if(isAvailable) logger.info("Email available for registeration.");
+			else logger.info("Email not available can't register.");
+			return new EmailAvailabilityMessage(isAvailable);
 		}
 		catch(Exception ex){
 			logger.error(ex.getMessage());
 			logger.error(ex.toString());
-			HttpHeaders headers = new HttpHeaders();
-			headers.add("Content-Type", "text/html");
-			return new ResponseEntity<String>("Ajax call encountred a server error.", headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new EmailAvailabilityMessage(false);
 		}
 	}
 	

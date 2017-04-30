@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
-public interface EntityValidator {
+public interface IEntityValidator {
 
-	public final static Logger logger = LoggerFactory.getLogger(EntityValidator.class);
+	public final static Logger logger = LoggerFactory.getLogger(IEntityValidator.class);
 	
 	public static final Set<String> ignore = new HashSet<>(Arrays.asList(
 			"createdDate","lastModifiedBy","createdBy","lastModifiedDate"
