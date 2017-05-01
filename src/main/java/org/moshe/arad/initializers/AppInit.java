@@ -9,13 +9,16 @@ import javax.annotation.Resource;
 
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
+import org.moshe.arad.kafka.consumers.config.LogInUserAckEventConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
+import org.moshe.arad.kafka.consumers.events.LogInUserAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.NewUserCreatedAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserEmailAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserNameAckEventConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
@@ -37,6 +40,11 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	
 	@Resource(name = "NewUserCreatedAckEventConfig")
 	private SimpleConsumerConfig newUserCreatedAckEventConfig;
+	
+	private LogInUserAckEventConsumer logInUserAckEventConsumer;
+	
+	@Autowired
+	private LogInUserAckEventConfig logInUserAckEventConfig;
 	
 	private ExecutorService executor = Executors.newFixedThreadPool(6);
 	
@@ -61,6 +69,7 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			userNameAvailabilityCheckedEventConsumer = context.getBean(UserNameAckEventConsumer.class);
 			userEmailAvailabilityCheckedEventConsumer = context.getBean(UserEmailAckEventConsumer.class);
 			newUserCreatedAckEventConsumer = context.getBean(NewUserCreatedAckEventConsumer.class);
+			logInUserAckEventConsumer = context.getBean(LogInUserAckEventConsumer.class);
 			
 			logger.info("Initializing user name availability checked event consumer...");		
 			initSingleConsumer(userNameAvailabilityCheckedEventConsumer, KafkaUtils.USER_NAME_AVAILABILITY_CHECKED_EVENT_TOPIC, userNameAvailabilityCheckedEventConfig);		
@@ -74,7 +83,12 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			initSingleConsumer(newUserCreatedAckEventConsumer, KafkaUtils.NEW_USER_CREATED_ACK_EVENT_TOPIC, newUserCreatedAckEventConfig);		
 			logger.info("Initialize new user created ack event consumer, completed...");
 			
-			executeProducersAndConsumers(Arrays.asList(userEmailAvailabilityCheckedEventConsumer,userNameAvailabilityCheckedEventConsumer, newUserCreatedAckEventConsumer));
+			initSingleConsumer(logInUserAckEventConsumer, KafkaUtils.LOG_IN_USER_ACK_EVENT_TOPIC, logInUserAckEventConfig);
+			
+			executeProducersAndConsumers(Arrays.asList(userEmailAvailabilityCheckedEventConsumer,
+					userNameAvailabilityCheckedEventConsumer, 
+					newUserCreatedAckEventConsumer,
+					logInUserAckEventConsumer));
 		}
 	}	
 

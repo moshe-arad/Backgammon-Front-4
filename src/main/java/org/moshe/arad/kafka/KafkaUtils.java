@@ -24,4 +24,6 @@ public class KafkaUtils {
 	public static final String NEW_USER_CREATED_ACK_EVENT_GROUP = "NewUserCreatedAckEventGroup";
 	public static final String NEW_USER_CREATED_ACK_EVENT_TOPIC = "New-User-Created-Ack-Event";
 	public static final String LOG_IN_USER_COMMAND_TOPIC = "Log-In-User-Command";
+	public static final String LOG_IN_USER_ACK_EVENT_TOPIC = "Log-In-User-Ack-Event";
+	public static final String LOG_IN_USER_ACK_EVENT_GROUP = "LogInUserAckEventGroup";
 }

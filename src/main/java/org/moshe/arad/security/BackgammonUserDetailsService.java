@@ -6,8 +6,12 @@ import org.moshe.arad.entities.BackgammonUser;
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.LogInUserCommand;
+import org.moshe.arad.kafka.events.LogInUserAckEvent;
+import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
 import org.moshe.arad.repository.IBackgammonUserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +31,9 @@ public class BackgammonUserDetailsService implements UserDetailsService{
 	@Autowired
 	private EventsPool eventsPoll;
 	
+	private Logger logger = LoggerFactory.getLogger(BackgammonUserDetailsService.class);
+	
+	@SuppressWarnings("finally")
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
 		UserDetails result = backgammonUserRepository.findByUserName(userName);
@@ -50,7 +57,22 @@ public class BackgammonUserDetailsService implements UserDetailsService{
 			}
 		}
 		
+		LogInUserAckEvent logInUserAckEvent = (LogInUserAckEvent) eventsPoll.takeEventFromPoll(uuid);
 		
+		if(!logInUserAckEvent.isUserFound()) throw new UsernameNotFoundException("Failed to find user and log him in...");
+		else{
+			try{
+				logger.info("******************************************");
+				logger.info("******************************************");
+				logger.info("******************************************");
+				logger.info("******************************************");
+				logger.info("******************************************");
+				logger.info("******************************************");
+			}
+			finally {
+				return result;
+			}
+		}
 	}
 		
 }
