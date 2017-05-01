@@ -11,8 +11,8 @@ import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.consumers.events.NewUserCreatedAckEventConsumer;
-import org.moshe.arad.kafka.consumers.events.UserEmailAvailabilityCheckedEventConsumer;
-import org.moshe.arad.kafka.consumers.events.UserNameAvailabilityCheckedEventConsumer;
+import org.moshe.arad.kafka.consumers.events.UserEmailAckEventConsumer;
+import org.moshe.arad.kafka.consumers.events.UserNameAckEventConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -23,12 +23,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	
-	private UserNameAvailabilityCheckedEventConsumer userNameAvailabilityCheckedEventConsumer;
+	private UserNameAckEventConsumer userNameAvailabilityCheckedEventConsumer;
 	
 	@Resource(name = "UserNameAvailabilityCheckedEventConfig")
 	private SimpleConsumerConfig userNameAvailabilityCheckedEventConfig;
 	
-	private UserEmailAvailabilityCheckedEventConsumer userEmailAvailabilityCheckedEventConsumer;
+	private UserEmailAckEventConsumer userEmailAvailabilityCheckedEventConsumer;
 	
 	@Resource(name = "UserEmailAvailabilityCheckedEventConfig")
 	private SimpleConsumerConfig userEamilAvailabilityCheckedEventConfig;
@@ -58,8 +58,8 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	@Override
 	public void initKafkaEventsConsumers() {
 		for(int i=0; i<NUM_CONSUMERS; i++){
-			userNameAvailabilityCheckedEventConsumer = context.getBean(UserNameAvailabilityCheckedEventConsumer.class);
-			userEmailAvailabilityCheckedEventConsumer = context.getBean(UserEmailAvailabilityCheckedEventConsumer.class);
+			userNameAvailabilityCheckedEventConsumer = context.getBean(UserNameAckEventConsumer.class);
+			userEmailAvailabilityCheckedEventConsumer = context.getBean(UserEmailAckEventConsumer.class);
 			newUserCreatedAckEventConsumer = context.getBean(NewUserCreatedAckEventConsumer.class);
 			
 			logger.info("Initializing user name availability checked event consumer...");		

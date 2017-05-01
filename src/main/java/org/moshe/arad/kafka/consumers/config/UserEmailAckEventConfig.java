@@ -4,9 +4,9 @@ import org.moshe.arad.kafka.KafkaUtils;
 import org.springframework.stereotype.Component;
 
 @Component("UserEmailAvailabilityCheckedEventConfig")
-public class UserEmailAvailabilityCheckedEventConfig extends SimpleConsumerConfig {
+public class UserEmailAckEventConfig extends SimpleConsumerConfig {
 
-	public UserEmailAvailabilityCheckedEventConfig() {
+	public UserEmailAckEventConfig() {
 		super();
 		super.getProperties().put("group.id", KafkaUtils.USER_EMAIL_AVAILABILITY_CHECKED_EVENT_GROUP);
 	}

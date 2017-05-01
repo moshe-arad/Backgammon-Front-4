@@ -23,4 +23,5 @@ public class KafkaUtils {
 	public static final String EMAIL_AVAILABILITY_CHECKED_EVENT_TOPIC = "Email-Availability-Checked-Event";
 	public static final String NEW_USER_CREATED_ACK_EVENT_GROUP = "NewUserCreatedAckEventGroup";
 	public static final String NEW_USER_CREATED_ACK_EVENT_TOPIC = "New-User-Created-Ack-Event";
+	public static final String LOG_IN_USER_COMMAND_TOPIC = "Log-In-User-Command";
 }

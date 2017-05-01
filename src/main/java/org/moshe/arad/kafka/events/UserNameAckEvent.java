@@ -6,14 +6,14 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserNameAvailabilityCheckedEvent extends BackgammonEvent{
+public class UserNameAckEvent extends BackgammonEvent{
 	
 	private boolean isAvailable;
 	
-	public UserNameAvailabilityCheckedEvent() {
+	public UserNameAckEvent() {
 	}
 
-	public UserNameAvailabilityCheckedEvent(UUID uuid, int serviceId, int eventId, Date arrived, String clazz,
+	public UserNameAckEvent(UUID uuid, int serviceId, int eventId, Date arrived, String clazz,
 			boolean isAvailable) {
 		super(uuid, serviceId, eventId, arrived, clazz);
 		this.isAvailable = isAvailable;

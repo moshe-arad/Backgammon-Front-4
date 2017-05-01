@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
 import org.moshe.arad.kafka.events.NewUserCreatedAckEvent;
-import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
+import org.moshe.arad.kafka.events.UserEmailAckEvent;
 import org.moshe.arad.services.HomeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

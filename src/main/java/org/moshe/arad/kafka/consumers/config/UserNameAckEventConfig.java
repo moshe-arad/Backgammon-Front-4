@@ -4,9 +4,9 @@ import org.moshe.arad.kafka.KafkaUtils;
 import org.springframework.stereotype.Component;
 
 @Component("UserNameAvailabilityCheckedEventConfig")
-public class UserNameAvailabilityCheckedEventConfig extends SimpleConsumerConfig {
+public class UserNameAckEventConfig extends SimpleConsumerConfig {
 
-	public UserNameAvailabilityCheckedEventConfig() {
+	public UserNameAckEventConfig() {
 		super();
 		super.getProperties().put("group.id", KafkaUtils.USER_NAME_AVAILABILITY_CHECKED_EVENT_GROUP);
 	}

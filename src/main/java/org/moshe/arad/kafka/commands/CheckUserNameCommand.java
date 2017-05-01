@@ -5,14 +5,14 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component("CheckUserNameAvailabilityCommand")
-public class CheckUserNameAvailabilityCommand extends Command {
+public class CheckUserNameCommand extends Command {
 
 	private String userName;
 	
-	public CheckUserNameAvailabilityCommand() {
+	public CheckUserNameCommand() {
 	}
 	
-	public CheckUserNameAvailabilityCommand(UUID uuid, String userName) {
+	public CheckUserNameCommand(UUID uuid, String userName) {
 		super(uuid);
 		this.userName = userName;
 	}

@@ -5,14 +5,14 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component("CheckUserEmailAvailabilityCommand")
-public class CheckUserEmailAvailabilityCommand extends Command {
+public class CheckUserEmailCommand extends Command {
 
 	private String email;
 
-	public CheckUserEmailAvailabilityCommand() {
+	public CheckUserEmailCommand() {
 	}
 	
-	public CheckUserEmailAvailabilityCommand(UUID uuid, String email) {
+	public CheckUserEmailCommand(UUID uuid, String email) {
 		super(uuid);
 		this.email = email;
 	}

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
-import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
+import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.services.HomeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,19 +16,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component("UserNameAvailabilityCheckedEventConsumer")
 @Scope("prototype")
-public class UserNameAvailabilityCheckedEventConsumer extends SimpleEventsConsumer implements ISimpleConsumer {
+public class UserNameAckEventConsumer extends SimpleEventsConsumer implements ISimpleConsumer {
 
 	@Autowired
 	private HomeService homeService;
 	
-	Logger logger = LoggerFactory.getLogger(UserNameAvailabilityCheckedEventConsumer.class);
+	Logger logger = LoggerFactory.getLogger(UserNameAckEventConsumer.class);
 	
-	public UserNameAvailabilityCheckedEventConsumer() {
+	public UserNameAckEventConsumer() {
 	}
 
 	@Override
 	public void consumerOperations(ConsumerRecord<String,String> record) {
-		UserNameAvailabilityCheckedEvent userNameAvailabilityCheckedEvent = convertJsonBlobIntoEvent(record.value());
+		UserNameAckEvent userNameAvailabilityCheckedEvent = convertJsonBlobIntoEvent(record.value());
 		
 		Object locker = homeService.getEventsPoll().getUserNamesLockers().get(userNameAvailabilityCheckedEvent.getUuid().toString());
 		synchronized (locker) {
@@ -40,10 +40,10 @@ public class UserNameAvailabilityCheckedEventConsumer extends SimpleEventsConsum
 		}			
 	}
 	
-	private UserNameAvailabilityCheckedEvent convertJsonBlobIntoEvent(String JsonBlob){
+	private UserNameAckEvent convertJsonBlobIntoEvent(String JsonBlob){
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			return objectMapper.readValue(JsonBlob, UserNameAvailabilityCheckedEvent.class);
+			return objectMapper.readValue(JsonBlob, UserNameAckEvent.class);
 		} catch (IOException e) {
 			logger.error("Falied to convert Json blob into Event...");
 			logger.error(e.getMessage());

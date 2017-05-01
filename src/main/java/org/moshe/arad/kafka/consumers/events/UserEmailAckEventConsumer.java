@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
-import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
+import org.moshe.arad.kafka.events.UserEmailAckEvent;
 import org.moshe.arad.services.HomeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,19 +16,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component("UserEmailAvailabilityCheckedEventConsumer")
 @Scope("prototype")
-public class UserEmailAvailabilityCheckedEventConsumer extends SimpleEventsConsumer implements ISimpleConsumer {
+public class UserEmailAckEventConsumer extends SimpleEventsConsumer implements ISimpleConsumer {
 
 	@Autowired
 	private HomeService homeService;
 	
-	private Logger logger = LoggerFactory.getLogger(UserEmailAvailabilityCheckedEventConsumer.class);
+	private Logger logger = LoggerFactory.getLogger(UserEmailAckEventConsumer.class);
 	
-	public UserEmailAvailabilityCheckedEventConsumer() {
+	public UserEmailAckEventConsumer() {
 	}
 
 	@Override
 	public void consumerOperations(ConsumerRecord<String,String> record) {
-		UserEmailAvailabilityCheckedEvent userEmailAvailabilityCheckedEvent = convertJsonBlobIntoEvent(record.value());
+		UserEmailAckEvent userEmailAvailabilityCheckedEvent = convertJsonBlobIntoEvent(record.value());
 		Object locker = homeService.getEventsPoll().getEmailsLockers().get(userEmailAvailabilityCheckedEvent.getUuid().toString());
 		
 		if(locker!= null){
@@ -43,10 +43,10 @@ public class UserEmailAvailabilityCheckedEventConsumer extends SimpleEventsConsu
 						
 	}
 	
-	private UserEmailAvailabilityCheckedEvent convertJsonBlobIntoEvent(String JsonBlob){
+	private UserEmailAckEvent convertJsonBlobIntoEvent(String JsonBlob){
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			return objectMapper.readValue(JsonBlob, UserEmailAvailabilityCheckedEvent.class);
+			return objectMapper.readValue(JsonBlob, UserEmailAckEvent.class);
 		} catch (IOException e) {
 			logger.error("Falied to convert Json blob into Event...");
 			logger.error(e.getMessage());

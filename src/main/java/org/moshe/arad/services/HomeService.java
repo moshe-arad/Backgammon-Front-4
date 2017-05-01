@@ -7,12 +7,12 @@ import javax.annotation.Resource;
 import org.moshe.arad.entities.BackgammonUser;
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
-import org.moshe.arad.kafka.commands.CheckUserEmailAvailabilityCommand;
-import org.moshe.arad.kafka.commands.CheckUserNameAvailabilityCommand;
+import org.moshe.arad.kafka.commands.CheckUserEmailCommand;
+import org.moshe.arad.kafka.commands.CheckUserNameCommand;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
 import org.moshe.arad.kafka.events.NewUserCreatedAckEvent;
-import org.moshe.arad.kafka.events.UserEmailAvailabilityCheckedEvent;
-import org.moshe.arad.kafka.events.UserNameAvailabilityCheckedEvent;
+import org.moshe.arad.kafka.events.UserEmailAckEvent;
+import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
 import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
 import org.moshe.arad.repository.IBackgammonUserRepository;
@@ -36,10 +36,10 @@ public class HomeService implements ApplicationContextAware {
 	private SimpleCommandsProducer<CreateNewUserCommand> simpleCreateNewUserCommandProducer;
 	
 	@Autowired
-	private SimpleCommandsProducer<CheckUserNameAvailabilityCommand> simpleCheckUserNameAvailabilityCommandProducer;
+	private SimpleCommandsProducer<CheckUserNameCommand> simpleCheckUserNameAvailabilityCommandProducer;
 	
 	@Autowired
-	private SimpleCommandsProducer<CheckUserEmailAvailabilityCommand> simpleCheckUserEmailAvailabilityCommandProducer;
+	private SimpleCommandsProducer<CheckUserEmailCommand> simpleCheckUserEmailAvailabilityCommandProducer;
 	
 	@Autowired
 	private EventsPool eventsPoll;	
@@ -57,7 +57,7 @@ public class HomeService implements ApplicationContextAware {
 		UUID uuid;
 		
 		simpleCheckUserNameAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC);
-		CheckUserNameAvailabilityCommand checkUserNameAvailabilityCommand = getUserNameCommand(userNameMessage);
+		CheckUserNameCommand checkUserNameAvailabilityCommand = getUserNameCommand(userNameMessage);
 		
 		uuid = simpleCheckUserNameAvailabilityCommandProducer.sendKafkaMessage(checkUserNameAvailabilityCommand);
 		eventsPoll.getUserNamesLockers().put(uuid.toString(), Thread.currentThread());
@@ -72,7 +72,7 @@ public class HomeService implements ApplicationContextAware {
 			}
 		}
 		
-		UserNameAvailabilityCheckedEvent userNameAvailabilityCheckedEvent = (UserNameAvailabilityCheckedEvent) eventsPoll.takeEventFromPoll(uuid);
+		UserNameAckEvent userNameAvailabilityCheckedEvent = (UserNameAckEvent) eventsPoll.takeEventFromPoll(uuid);
 		return userNameAvailabilityCheckedEvent.isAvailable();
 	}	
 	
@@ -80,7 +80,7 @@ public class HomeService implements ApplicationContextAware {
 		UUID uuid;
 		
 		simpleCheckUserEmailAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_EMAIL_AVAILABILITY_COMMAND_TOPIC);				
-		CheckUserEmailAvailabilityCommand checkUserEmailAvailabilityCommand = getEmailCommand(emailMessage);
+		CheckUserEmailCommand checkUserEmailAvailabilityCommand = getEmailCommand(emailMessage);
 		
 		uuid = simpleCheckUserEmailAvailabilityCommandProducer.sendKafkaMessage(checkUserEmailAvailabilityCommand);
 		eventsPoll.getEmailsLockers().put(uuid.toString(), Thread.currentThread());
@@ -94,7 +94,7 @@ public class HomeService implements ApplicationContextAware {
 			}
 		}
 		
-		UserEmailAvailabilityCheckedEvent userEmailAvailabilityCheckedEvent = (UserEmailAvailabilityCheckedEvent) eventsPoll.takeEventFromPoll(uuid);
+		UserEmailAckEvent userEmailAvailabilityCheckedEvent = (UserEmailAckEvent) eventsPoll.takeEventFromPoll(uuid);
 		return userEmailAvailabilityCheckedEvent.isAvailable();
 	}
 
@@ -140,14 +140,14 @@ public class HomeService implements ApplicationContextAware {
 		logger.info("User saved to local DB, and authenticated.");
 	}
 	
-	private CheckUserNameAvailabilityCommand getUserNameCommand(UserNameMessage userNameMessage) {
-		CheckUserNameAvailabilityCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameAvailabilityCommand.class);			
+	private CheckUserNameCommand getUserNameCommand(UserNameMessage userNameMessage) {
+		CheckUserNameCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameCommand.class);			
 		checkUserNameAvailabilityCommand.setUserName(userNameMessage.getUserName());
 		return checkUserNameAvailabilityCommand;
 	}
 	
-	private CheckUserEmailAvailabilityCommand getEmailCommand(EmailMessage emailMessage) {
-		CheckUserEmailAvailabilityCommand checkUserEmailAvailabilityCommand = context.getBean(CheckUserEmailAvailabilityCommand.class);			
+	private CheckUserEmailCommand getEmailCommand(EmailMessage emailMessage) {
+		CheckUserEmailCommand checkUserEmailAvailabilityCommand = context.getBean(CheckUserEmailCommand.class);			
 		checkUserEmailAvailabilityCommand.setEmail(emailMessage.getEmail());
 		return checkUserEmailAvailabilityCommand;
 	}	

@@ -8,8 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.moshe.arad.kafka.events.BackgammonEvent;
-import org.moshe.arad.websocket.EmailMessage;
-import org.moshe.arad.websocket.UserNameMessage;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,13 +19,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class EventsPool {
 
-	private static final int POLL_SIZE = 100000;
+	private static final int POOL_SIZE = 100000;
 	private static final int SLEEP = 100;
-	private Set<BackgammonEvent> events = new HashSet<>(POLL_SIZE);
+	private Set<BackgammonEvent> events = new HashSet<>(POOL_SIZE);
 	
-	private Map<String, Thread> userNamesLockers = new HashMap<>(POLL_SIZE);
-	private Map<String, Thread> emailsLockers = new HashMap<>(POLL_SIZE);
-	private Map<String, Thread> createUserLockers = new HashMap<>(POLL_SIZE);
+	private Map<String, Thread> userNamesLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> emailsLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> createUserLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> userLogInLockers = new HashMap<>(POOL_SIZE);
 	
 	public boolean addEventToPool(BackgammonEvent event){
 		return events.add(event);
@@ -96,5 +95,13 @@ public class EventsPool {
 
 	public void setCreateUserLockers(Map<String, Thread> createUserLockers) {
 		this.createUserLockers = createUserLockers;
+	}
+
+	public Map<String, Thread> getUserLogInLockers() {
+		return userLogInLockers;
+	}
+
+	public void setUserLogInLockers(Map<String, Thread> userLogInLockers) {
+		this.userLogInLockers = userLogInLockers;
 	}
 }
