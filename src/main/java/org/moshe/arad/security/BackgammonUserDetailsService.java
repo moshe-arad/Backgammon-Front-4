@@ -1,5 +1,6 @@
 package org.moshe.arad.security;
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.moshe.arad.entities.BackgammonUser;
@@ -7,8 +8,9 @@ import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.LogInUserCommand;
 import org.moshe.arad.kafka.events.LogInUserAckEvent;
-import org.moshe.arad.kafka.events.UserNameAckEvent;
+import org.moshe.arad.kafka.events.LoggedInEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
+import org.moshe.arad.kafka.producers.events.SimpleEventsProducer;
 import org.moshe.arad.repository.IBackgammonUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,12 +64,25 @@ public class BackgammonUserDetailsService implements UserDetailsService{
 		if(!logInUserAckEvent.isUserFound()) throw new UsernameNotFoundException("Failed to find user and log him in...");
 		else{
 			try{
-				logger.info("******************************************");
-				logger.info("******************************************");
-				logger.info("******************************************");
-				logger.info("******************************************");
-				logger.info("******************************************");
-				logger.info("******************************************");
+				logger.info("User was found...");
+				logger.info("Sending logged in event to mongo and lobby...");
+				SimpleEventsProducer<LoggedInEvent> loggedInEventProducer = context.getBean(SimpleEventsProducer.class);
+				loggedInEventProducer.setTopic(KafkaUtils.LOGGED_IN_EVENT_TOPIC);
+				LoggedInEvent loggedInEvent = context.getBean(LoggedInEvent.class);
+				loggedInEvent.setUuid(uuid);
+				loggedInEvent.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
+				loggedInEvent.setArrived(new Date());
+				loggedInEvent.setClazz("LoggedInEvent");
+				loggedInEventProducer.sendKafkaMessage(loggedInEvent);
+				logger.info("logged in event was sent successfuly to mongo and lobby...");
+				
+				
+				logger.info("***********************************************");
+				logger.info("***********************************************");
+				logger.info("***********************************************");
+				logger.info("***********************************************");
+				logger.info("***********************************************");
+				logger.info("***********************************************");
 			}
 			finally {
 				return result;

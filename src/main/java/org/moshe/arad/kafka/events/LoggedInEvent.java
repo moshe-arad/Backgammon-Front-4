@@ -9,41 +9,28 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("prototype")
-public class LogInUserAckEvent extends BackgammonEvent {
+public class LoggedInEvent extends BackgammonEvent {
 
-	private boolean isUserFound;
 	private BackgammonUser backgammonUser;
+
+	public LoggedInEvent() {
+		
+	}
 	
-	public LogInUserAckEvent() {
-	
+	public LoggedInEvent(BackgammonUser backgammonUser) {
+		super();
+		this.backgammonUser = backgammonUser;
 	}
 
-	public LogInUserAckEvent(UUID uuid, int serviceId, int eventId, Date arrived, String clazz, boolean isUserFound,
+	public LoggedInEvent(UUID uuid, int serviceId, int eventId, Date arrived, String clazz,
 			BackgammonUser backgammonUser) {
 		super(uuid, serviceId, eventId, arrived, clazz);
-		this.isUserFound = isUserFound;
 		this.backgammonUser = backgammonUser;
 	}
-
-
-	public LogInUserAckEvent(boolean isUserFound, BackgammonUser backgammonUser) {
-		super();
-		this.isUserFound = isUserFound;
-		this.backgammonUser = backgammonUser;
-	}
-
 
 	@Override
 	public String toString() {
-		return "LogInUserAckEvent [isUserFound=" + isUserFound + "]";
-	}
-
-	public boolean isUserFound() {
-		return isUserFound;
-	}
-
-	public void setUserFound(boolean isUserFound) {
-		this.isUserFound = isUserFound;
+		return "LoggedInEvent [backgammonUser=" + backgammonUser + "]";
 	}
 
 	public BackgammonUser getBackgammonUser() {
@@ -52,5 +39,5 @@ public class LogInUserAckEvent extends BackgammonEvent {
 
 	public void setBackgammonUser(BackgammonUser backgammonUser) {
 		this.backgammonUser = backgammonUser;
-	}	
+	}
 }
