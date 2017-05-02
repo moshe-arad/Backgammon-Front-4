@@ -2,7 +2,7 @@ package org.moshe.arad.controllers;
 
 import javax.validation.Valid;
 
-import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.entities.BackgammonUserDetails;
 import org.moshe.arad.services.HomeService;
 import org.moshe.arad.validators.BackgammonUserValidator;
 import org.moshe.arad.websocket.EmailAvailabilityMessage;
@@ -38,7 +38,7 @@ public class UsersController {
 	private HomeService homeService;
 	
 	@RequestMapping(value = "/users/", method = RequestMethod.POST)
-	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUser backgammonUser, Errors errors){
+	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUserDetails backgammonUser, Errors errors){
 		if(errors.hasErrors()){
 			logger.info("Some errors occured while trying to bind backgammon user");
 			logger.info("There are " + errors.getErrorCount() + " errors.");

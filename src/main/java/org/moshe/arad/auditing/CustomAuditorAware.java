@@ -1,6 +1,6 @@
 package org.moshe.arad.auditing;
 
-import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.entities.BackgammonUserDetails;
 import org.moshe.arad.repository.IBackgammonUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;

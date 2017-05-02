@@ -3,7 +3,7 @@ package org.moshe.arad.security;
 import java.util.Date;
 import java.util.UUID;
 
-import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.entities.BackgammonUserDetails;
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.LogInUserCommand;
@@ -44,7 +44,7 @@ public class BackgammonUserDetailsService implements UserDetailsService{
 		SimpleCommandsProducer<LogInUserCommand> logInUserCommandProducer = context.getBean(SimpleCommandsProducer.class);
 		logInUserCommandProducer.setTopic(KafkaUtils.LOG_IN_USER_COMMAND_TOPIC);
 		LogInUserCommand logInUserCommand = context.getBean(LogInUserCommand.class);
-		logInUserCommand.setUser((BackgammonUser)result);
+		logInUserCommand.setUser((BackgammonUserDetails)result);
 		
 		UUID uuid = logInUserCommandProducer.sendKafkaMessage(logInUserCommand);
 		eventsPoll.getUserLogInLockers().put(uuid.toString(), Thread.currentThread());
@@ -75,14 +75,6 @@ public class BackgammonUserDetailsService implements UserDetailsService{
 				loggedInEvent.setClazz("LoggedInEvent");
 				loggedInEventProducer.sendKafkaMessage(loggedInEvent);
 				logger.info("logged in event was sent successfuly to mongo and lobby...");
-				
-				
-				logger.info("***********************************************");
-				logger.info("***********************************************");
-				logger.info("***********************************************");
-				logger.info("***********************************************");
-				logger.info("***********************************************");
-				logger.info("***********************************************");
 			}
 			finally {
 				return result;

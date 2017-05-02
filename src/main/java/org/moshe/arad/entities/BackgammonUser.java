@@ -1,113 +1,82 @@
 package org.moshe.arad.entities;
 
-import java.util.Collection;
-import java.util.Date;
+public class BackgammonUser {
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-@Entity
-@Table(name="users")
-@EntityListeners(AuditingEntityListener.class)
-public class BackgammonUser implements UserDetails{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long userId;
-	
-	@Column(name="username")
-	@NotBlank
 	private String userName;
-	
-	@NotBlank
 	private String password;
-	
-	@NotNull
-	@JsonIgnore
-	private Boolean enabled;
-	
-	@NotBlank
-	@Transient
 	private String firstName;
-	
-	@NotBlank
-	@Transient
 	private String lastName;
-	
-	@Email
-	@Transient
 	private String email;
-
-	@Column(name="last_modified_date")
-	@NotNull
-	@LastModifiedDate
-	@JsonIgnore
-	private Date lastModifiedDate;
-	
-	@Column(name="last_modified_by")
-	@NotNull
-	@LastModifiedBy
-	@JsonIgnore
-	private String lastModifiedBy;
-	
-	@Column(name="created_date")
-	@NotNull
-	@CreatedDate
-	@JsonIgnore
-	private Date createdDate;
-	
-	@Column(name="created_by")
-	@NotNull
-	@CreatedBy
-	@JsonIgnore
-	private String createdBy;
+	private Status status;
 
 	public BackgammonUser() {
 	}
 	
-	public BackgammonUser(String userName, String password, Boolean enabled, String firstName, String lastName,
-			String email, Date lastModifiedDate, String lastModifiedBy, Date createdDate, String createdBy) {
-		super();
+	public BackgammonUser(String userName, String password, String firstName, String lastName, String email, Status status) {
 		this.userName = userName;
 		this.password = password;
-		this.enabled = enabled;
-		this.lastModifiedDate = lastModifiedDate;
-		this.lastModifiedBy = lastModifiedBy;
-		this.createdDate = createdDate;
-		this.createdBy = createdBy;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.status = status; 
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
+		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
+		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BackgammonUser other = (BackgammonUser) obj;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
+			return false;
+		if (firstName == null) {
+			if (other.firstName != null)
+				return false;
+		} else if (!firstName.equals(other.firstName))
+			return false;
+		if (lastName == null) {
+			if (other.lastName != null)
+				return false;
+		} else if (!lastName.equals(other.lastName))
+			return false;
+		if (status != other.status)
+			return false;
+		if (password == null) {
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
+			return false;
+		if (userName == null) {
+			if (other.userName != null)
+				return false;
+		} else if (!userName.equals(other.userName))
+			return false;
+		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "BackgammonUser [userId=" + userId + ", userName=" + userName + ", password=" + password + ", enabled="
-				+ enabled + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
-				+ ", lastModifiedDate=" + lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy + ", createdDate="
-				+ createdDate + ", createdBy=" + createdBy + "]";
+		return "BackgammonUser [userName=" + userName + ", password=" + password + ", firstName=" + firstName
+				+ ", lastName=" + lastName + ", email=" + email + ", location=" + status + "]";
 	}
 
 	public String getUserName() {
@@ -126,14 +95,6 @@ public class BackgammonUser implements UserDetails{
 		this.password = password;
 	}
 
-	public Boolean getEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(Boolean enabled) {
-		this.enabled = enabled;
-	}
-	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -158,71 +119,11 @@ public class BackgammonUser implements UserDetails{
 		this.email = email;
 	}
 
-	public Date getLastModifiedDate() {
-		return lastModifiedDate;
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setLastModifiedDate(Date lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}
-
-	public String getLastModifiedBy() {
-		return lastModifiedBy;
-	}
-
-	public void setLastModifiedBy(String lastModifiedBy) {
-		this.lastModifiedBy = lastModifiedBy;
-	}
-
-	public Date getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(Date createDate) {
-		this.createdDate = createDate;
-	}
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	@Override
-	@JsonIgnore
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return AuthorityUtils.createAuthorityList("Backgammon_User");
-	}
-
-	@Override
-	@JsonIgnore
-	public String getUsername() {
-		return userName;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isAccountNonExpired() {
-		return true;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isEnabled() {
-		return true;
-	}
+	public void setStatus(Status status) {
+		this.status = status;
+	}	
 }

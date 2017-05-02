@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.entities.BackgammonUserDetails;
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.CheckUserEmailCommand;
@@ -98,7 +98,7 @@ public class HomeService implements ApplicationContextAware {
 		return userEmailAvailabilityCheckedEvent.isAvailable();
 	}
 
-	public boolean createNewUser(BackgammonUser backgammonUser){
+	public boolean createNewUser(BackgammonUserDetails backgammonUser){
 		UUID uuid;
 		
 		simpleCreateNewUserCommandProducer.setTopic(KafkaUtils.CREATE_NEW_USER_COMMAND_TOPIC);
@@ -127,13 +127,13 @@ public class HomeService implements ApplicationContextAware {
 		else return false;
 	}
 
-	private CreateNewUserCommand getCreateNewUserCommand(BackgammonUser backgammonUser) {
+	private CreateNewUserCommand getCreateNewUserCommand(BackgammonUserDetails backgammonUser) {
 		CreateNewUserCommand createNewUserCommand = context.getBean(CreateNewUserCommand.class);
 		createNewUserCommand.setBackgammonUser(backgammonUser);
 		return createNewUserCommand;
 	}
 
-	private void saveUserAndAuthenticate(BackgammonUser backgammonUser) {
+	private void saveUserAndAuthenticate(BackgammonUserDetails backgammonUser) {
 		backgammonUser.setEnabled(true);
 		backgammonUserRepository.save(backgammonUser);
 		authenticateUser(backgammonUser);
@@ -152,7 +152,7 @@ public class HomeService implements ApplicationContextAware {
 		return checkUserEmailAvailabilityCommand;
 	}	
 	
-	private void authenticateUser(BackgammonUser backgammonUser) {
+	private void authenticateUser(BackgammonUserDetails backgammonUser) {
 		Authentication auth = new UsernamePasswordAuthenticationToken(backgammonUser, 
 				backgammonUser.getPassword(), backgammonUser.getAuthorities()); 
 		SecurityContextHolder.getContext().setAuthentication(auth);

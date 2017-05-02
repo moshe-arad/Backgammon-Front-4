@@ -1,6 +1,6 @@
 package org.moshe.arad.validators;
 
-import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.entities.BackgammonUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
@@ -13,7 +13,7 @@ public class BackgammonUserValidator implements Validator, IEntityValidator {
 	
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return BackgammonUser.class.equals(clazz);
+		return BackgammonUserDetails.class.equals(clazz);
 	}
 
 	@Override
