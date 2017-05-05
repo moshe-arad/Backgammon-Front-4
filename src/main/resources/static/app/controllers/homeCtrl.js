@@ -22,7 +22,7 @@
 		    stompClient = Stomp.over(socket);
 		    stompClient.connect({}, function (frame) {		      
 		        console.log('Connected: ' + frame);
-		        stompClient.subscribe('/frontEndPoint/user_name', function (data) {
+		        stompClient.subscribe('/topic/users.user_name', function (data) { 
 		            if(JSON.parse(data.body).isAvailable == false){
 		            	angular.element("#invalidUserName").html("User name is not available.")
 						angular.element("#invalidUserName").removeClass("hidden");		            	
@@ -34,7 +34,7 @@
 		            }
 		        });
 		        
-		        stompClient.subscribe('/frontEndPoint/email', function (data) {
+		        stompClient.subscribe('/topic/users.email', function (data) {
 		            if(JSON.parse(data.body).isAvailable == false){
 		            	angular.element("#invalidEmail").html("Email is not available.");
 						angular.element("#invalidEmail").removeClass("hidden");	
@@ -69,6 +69,7 @@
 					$rootScope.isAuthenticated = true;
 					$rootScope.credentials = {username:data.userName};
 					console.log("Navigating to lobby");
+					$scope.user = {};
 					$location.path("/lobby");	
 				}
 				else if(status == 200){
@@ -126,7 +127,7 @@
 				if(isValidEmail($scope.user.email)) 
 				{	
 					angular.element("#invalidEmail").addClass("hidden");
-					stompClient.send("/backEndPoint/users/email/", {}, JSON.stringify({'email': $scope.user.email}));
+					stompClient.send("/topic/users.email", {}, JSON.stringify({'email': $scope.user.email}));
 				}
 				else{
 					angular.element("#invalidEmail").html("Invalid email address.");
@@ -148,7 +149,7 @@
 			if($scope.user.userName != undefined && ($scope.user.userName).trim() != ""){
 				if(isValidUserName($scope.user.userName)){
 					angular.element("#invalidUserName").addClass("hidden");
-					stompClient.send("/backEndPoint/users/user_name/", {}, JSON.stringify({'userName': $scope.user.userName}));				
+					stompClient.send("/topic/users.user_name", {}, JSON.stringify({'userName': $scope.user.userName}));				
 				}
 				else{
 					angular.element("#invalidUserName").html("Invalid user name.");

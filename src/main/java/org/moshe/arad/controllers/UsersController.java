@@ -85,8 +85,8 @@ public class UsersController {
 		}
 	}
 	
-	@MessageMapping("/users/user_name/")
-	@SendTo("/frontEndPoint/user_name")
+	@MessageMapping("/users.user_name")
+	@SendTo("/user_name")
 	public UserNameAvailabilityMessage isUserNameAvailable(UserNameMessage userNameMessage){
 		boolean isAvailable = false;
 		
@@ -104,8 +104,8 @@ public class UsersController {
 		}
 	}
 	
-	@MessageMapping("/users/email/")
-	@SendTo("/frontEndPoint/email")
+	@MessageMapping("/users.email")
+	@SendTo("/email")
 	public EmailAvailabilityMessage isUserEmailAvailable(EmailMessage emailMessage){
 		boolean isAvailable = false;
 		

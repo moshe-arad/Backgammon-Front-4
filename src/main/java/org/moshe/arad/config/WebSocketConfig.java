@@ -12,10 +12,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
 	@Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-		//end-point for back send to front
-        config.enableSimpleBroker("/frontEndPoint");
-      //end-point for front send to back
-        config.setApplicationDestinationPrefixes("/backEndPoint");
+		config.enableStompBrokerRelay("/topic/", "/queue/");
+        config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override

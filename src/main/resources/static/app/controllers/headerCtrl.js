@@ -3,9 +3,7 @@
 	function HeaderCtrl($rootScope, $http, $location){
 		
 		$rootScope.credentials = {};
-//		$rootScope.loginError = "";
-		$rootScope.isAuthenticated = false;
-//		$rootScope.logoutSuccess = false; 
+		$rootScope.isAuthenticated = false; 
 		
 	  var authenticate = function(credentials, callback) {
 
