@@ -1,9 +1,9 @@
-
-(function(){
-	
-	function HomeCtrl ($rootScope, $scope, $interval, $timeout, $location, $http) {
-	
-		$scope.user = {};
+angular.module("backgammonApp")
+    .controller('HomeCtrl',
+    ['$rootScope', '$scope', '$interval', '$timeout', '$location', '$http', 'HomeService',
+    function ($rootScope, $scope, $interval, $timeout, $location, $http, homeService) {
+    	
+    	$scope.user = {};
 		$scope.register_error = false;
 		
 		var isEmailAvailable = false;
@@ -17,40 +17,47 @@
 		
 		var stompClient = null;
 		
+//		var init = function(){
+//			var socket = new SockJS('/backgammon-websocket');
+//		    stompClient = Stomp.over(socket);
+//		    stompClient.connect({}, function (frame) {		      
+//		        console.log('Connected: ' + frame);
+//		        stompClient.subscribe('/app/users.user_name', function (data) { 
+//		            if(JSON.parse(data.body).isAvailable == false){
+//		            	angular.element("#invalidUserName").html("User name is not available.")
+//						angular.element("#invalidUserName").removeClass("hidden");		            	
+//		            	isUserNamePassedValidation = false;
+//		            }
+//		            else{		            			            	
+//		            	isUserNamePassedValidation = true;
+//		            	console.log("User Name available...")
+//		            }
+//		        });
+//		        
+//		        stompClient.subscribe('/app/users.email', function (data) {
+//		            if(JSON.parse(data.body).isAvailable == false){
+//		            	angular.element("#invalidEmail").html("Email is not available.");
+//						angular.element("#invalidEmail").removeClass("hidden");	
+//						isEmailPassedValidation = false;
+//		            }
+//		            else{		            	
+//		            	isEmailPassedValidation = true;		          
+//		            	console.log("Email available...")
+//		            }
+//		        });
+//		        console.log("*************sssssss");
+//		    });		 			    
+//		};		
+		
 		var init = function(){
-			var socket = new SockJS('/backgammon-websocket');
-		    stompClient = Stomp.over(socket);
-		    stompClient.connect({}, function (frame) {		      
-		        console.log('Connected: ' + frame);
-		        stompClient.subscribe('/topic/users.user_name', function (data) { 
-		            if(JSON.parse(data.body).isAvailable == false){
-		            	angular.element("#invalidUserName").html("User name is not available.")
-						angular.element("#invalidUserName").removeClass("hidden");		            	
-		            	isUserNamePassedValidation = false;
-		            }
-		            else{		            			            	
-		            	isUserNamePassedValidation = true;
-		            	console.log("User Name available...")
-		            }
-		        });
-		        
-		        stompClient.subscribe('/topic/users.email', function (data) {
-		            if(JSON.parse(data.body).isAvailable == false){
-		            	angular.element("#invalidEmail").html("Email is not available.");
-						angular.element("#invalidEmail").removeClass("hidden");	
-						isEmailPassedValidation = false;
-		            }
-		            else{		            	
-		            	isEmailPassedValidation = true;		          
-		            	console.log("Email available...")
-		            }
-		        });
-		        
-		    });		 			    
-		};		
+			homeService.connect('/backgammon-websocket').then(function (username) {
+//				$scope.username = username;                   
+                homeService.subscribeCheckEmail();              
+            });
+		};
 		
 		init();
-		
+        
 		$scope.register = function() {						
 			console.log(isPassedValidation());
 			if(isPassedValidation() == "valid"){
@@ -127,7 +134,9 @@
 				if(isValidEmail($scope.user.email)) 
 				{	
 					angular.element("#invalidEmail").addClass("hidden");
-					stompClient.send("/topic/users.email", {}, JSON.stringify({'email': $scope.user.email}));
+					console.log(JSON.stringify({'email': $scope.user.email}));
+					console.log($scope.user.email);
+					homeService.sendCheckEmail($scope.user.email);
 				}
 				else{
 					angular.element("#invalidEmail").html("Invalid email address.");
@@ -149,7 +158,7 @@
 			if($scope.user.userName != undefined && ($scope.user.userName).trim() != ""){
 				if(isValidUserName($scope.user.userName)){
 					angular.element("#invalidUserName").addClass("hidden");
-					stompClient.send("/topic/users.user_name", {}, JSON.stringify({'userName': $scope.user.userName}));				
+					stompClient.send("/app/users.user_name", {}, JSON.stringify({'userName': $scope.user.userName}));				
 				}
 				else{
 					angular.element("#invalidUserName").html("Invalid user name.");
@@ -240,13 +249,21 @@
 			}, 500, 0, false, user);
 			
 		}
-	}
 	
 	$(function () {
 	    $("registerForm").on('submit', function (e) {
 	        e.preventDefault();
 	    });	
 	});
-	
-	backgammonApp.controller("HomeCtrl", HomeCtrl);
-})();
+    	
+    }]);
+
+
+//(function(){
+//	
+//	function HomeCtrl ($rootScope, $scope, $interval, $timeout, $location, $http, HomeService) {
+//	
+//		
+//	
+//	backgammonApp.controller("HomeCtrl", HomeCtrl, ['HomeService']);
+//})();

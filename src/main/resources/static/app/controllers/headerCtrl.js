@@ -1,8 +1,9 @@
-(function(){
-	
-	function HeaderCtrl($rootScope, $http, $location){
-		
-		$rootScope.credentials = {};
+angular.module("backgammonApp")
+    .controller('HeaderCtrl',
+    ['$rootScope', '$location', '$http',
+    function ($rootScope, $location, $http) {
+    	
+    	$rootScope.credentials = {};
 		$rootScope.isAuthenticated = false; 
 		
 	  var authenticate = function(credentials, callback) {
@@ -50,6 +51,14 @@
 		    $rootScope.authenticated = false;			    
 		  });
 		};
-	}
-	backgammonApp.controller("HeaderCtrl", HeaderCtrl);
-})();
+    	
+    }]);
+
+//(function(){
+//	
+//	function HeaderCtrl($rootScope, $http, $location){
+//		
+//		
+//	}
+//	backgammonApp.controller("HeaderCtrl", HeaderCtrl);
+//})();

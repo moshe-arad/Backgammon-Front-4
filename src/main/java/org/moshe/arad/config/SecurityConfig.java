@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers("/css/**", "/js/**", 
-				"/app/controllers/**", "/app/partials/**", "/app/*",
+				"/app/controllers/**", "/app/partials/**", "/app/services/**", "/app/*",
 				"/", "/index.html", "/favicon.ico", "/webjars/**", "/backgammon-websocket/**",
 				"/shutdown");
 	}

@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
@@ -104,8 +106,8 @@ public class UsersController {
 		}
 	}
 	
-	@MessageMapping("/users.email")
-	@SendTo("/email")
+	@MessageMapping("/user.email")
+	@SendToUser("/topic/user.email")
 	public EmailAvailabilityMessage isUserEmailAvailable(EmailMessage emailMessage){
 		boolean isAvailable = false;
 		
