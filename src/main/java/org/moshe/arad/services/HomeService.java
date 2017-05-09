@@ -53,11 +53,11 @@ public class HomeService implements ApplicationContextAware {
 	
 	
 	
-	public boolean isUserNameAvailable(UserNameMessage userNameMessage){
+	public boolean isUserNameAvailable(String userName){
 		UUID uuid;
 		
 		simpleCheckUserNameAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_NAME_AVAILABILITY_COMMAND_TOPIC);
-		CheckUserNameCommand checkUserNameAvailabilityCommand = getUserNameCommand(userNameMessage);
+		CheckUserNameCommand checkUserNameAvailabilityCommand = getUserNameCommand(userName);
 		
 		uuid = simpleCheckUserNameAvailabilityCommandProducer.sendKafkaMessage(checkUserNameAvailabilityCommand);
 		eventsPoll.getUserNamesLockers().put(uuid.toString(), Thread.currentThread());
@@ -76,7 +76,7 @@ public class HomeService implements ApplicationContextAware {
 		return userNameAvailabilityCheckedEvent.isAvailable();
 	}	
 	
-	public boolean isEmailAvailable(EmailMessage emailMessage){
+	public boolean isEmailAvailable(String emailMessage){
 		UUID uuid;
 		
 		simpleCheckUserEmailAvailabilityCommandProducer.setTopic(KafkaUtils.CHECK_USER_EMAIL_AVAILABILITY_COMMAND_TOPIC);				
@@ -87,7 +87,7 @@ public class HomeService implements ApplicationContextAware {
 		
 		synchronized (Thread.currentThread()) {
 			try {
-				Thread.currentThread().wait(5000);
+				Thread.currentThread().wait();
 			} catch (InterruptedException e) {				
 				e.printStackTrace();
 				return false;
@@ -104,7 +104,7 @@ public class HomeService implements ApplicationContextAware {
 		simpleCreateNewUserCommandProducer.setTopic(KafkaUtils.CREATE_NEW_USER_COMMAND_TOPIC);
 		CreateNewUserCommand createNewUserCommand = getCreateNewUserCommand(backgammonUser);	
 			
-		if(!isEmailAvailable(new EmailMessage(backgammonUser.getEmail())) || !isUserNameAvailable(new UserNameMessage(backgammonUser.getUsername()))) throw new RuntimeException("Email or user name is already taken.");
+		if(!isEmailAvailable(backgammonUser.getEmail()) || !isUserNameAvailable(backgammonUser.getUsername())) throw new RuntimeException("Email or user name is already taken.");
 		logger.info("User's email and user name are available.");
 		uuid = simpleCreateNewUserCommandProducer.sendKafkaMessage(createNewUserCommand);
 		eventsPoll.getCreateUserLockers().put(uuid.toString(), Thread.currentThread());
@@ -140,15 +140,15 @@ public class HomeService implements ApplicationContextAware {
 		logger.info("User saved to local DB, and authenticated.");
 	}
 	
-	private CheckUserNameCommand getUserNameCommand(UserNameMessage userNameMessage) {
+	private CheckUserNameCommand getUserNameCommand(String userName) {
 		CheckUserNameCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameCommand.class);			
-		checkUserNameAvailabilityCommand.setUserName(userNameMessage.getUserName());
+		checkUserNameAvailabilityCommand.setUserName(userName);
 		return checkUserNameAvailabilityCommand;
 	}
 	
-	private CheckUserEmailCommand getEmailCommand(EmailMessage emailMessage) {
+	private CheckUserEmailCommand getEmailCommand(String email) {
 		CheckUserEmailCommand checkUserEmailAvailabilityCommand = context.getBean(CheckUserEmailCommand.class);			
-		checkUserEmailAvailabilityCommand.setEmail(emailMessage.getEmail());
+		checkUserEmailAvailabilityCommand.setEmail(email);
 		return checkUserEmailAvailabilityCommand;
 	}	
 	

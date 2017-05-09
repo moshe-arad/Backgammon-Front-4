@@ -87,14 +87,13 @@ public class UsersController {
 		}
 	}
 	
-	@MessageMapping("/users.user_name")
-	@SendTo("/user_name")
-	public UserNameAvailabilityMessage isUserNameAvailable(UserNameMessage userNameMessage){
+	@RequestMapping(value = "/users/user_name/{userName}/", method = RequestMethod.GET)
+	public UserNameAvailabilityMessage isUserNameAvailable(@PathVariable String userName){
 		boolean isAvailable = false;
 		
 		try{
-			logger.info("User name bind result: " + userNameMessage);
-			isAvailable = homeService.isUserNameAvailable(userNameMessage);
+			logger.info("User name bind result: " + userName);
+			isAvailable = homeService.isUserNameAvailable(userName);
 			if(isAvailable) logger.info("User name available for registeration.");
 			else logger.info("User name not available can't register."); 				
 			return new UserNameAvailabilityMessage(isAvailable);
@@ -106,14 +105,13 @@ public class UsersController {
 		}
 	}
 	
-	@MessageMapping("/user.email")
-	@SendToUser("/topic/user.email")
-	public EmailAvailabilityMessage isUserEmailAvailable(EmailMessage emailMessage){
+	@RequestMapping(value = "/users/email/{email}/", method = RequestMethod.GET)
+	public EmailAvailabilityMessage isUserEmailAvailable(@PathVariable String email){
 		boolean isAvailable = false;
 		
 		try{
-			logger.info("Email bind result: " + emailMessage);
-			isAvailable = homeService.isEmailAvailable(emailMessage);
+			logger.info("Email bind result: " + email);
+			isAvailable = homeService.isEmailAvailable(email);
 			if(isAvailable) logger.info("Email available for registeration.");
 			else logger.info("Email not available can't register.");
 			return new EmailAvailabilityMessage(isAvailable);
