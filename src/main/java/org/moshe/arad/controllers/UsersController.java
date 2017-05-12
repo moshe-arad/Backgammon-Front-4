@@ -1,24 +1,23 @@
 package org.moshe.arad.controllers;
 
+import java.util.Arrays;
+
 import javax.validation.Valid;
 
-import org.moshe.arad.entities.BackgammonUserDetails;
+import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.entities.Status;
+import org.moshe.arad.replies.IsUserFoundReply;
+import org.moshe.arad.requests.UserCredentials;
 import org.moshe.arad.services.HomeService;
 import org.moshe.arad.validators.BackgammonUserValidator;
 import org.moshe.arad.websocket.EmailAvailabilityMessage;
-import org.moshe.arad.websocket.EmailMessage;
 import org.moshe.arad.websocket.UserNameAvailabilityMessage;
-import org.moshe.arad.websocket.UserNameMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,8 +39,22 @@ public class UsersController {
 	@Autowired
 	private HomeService homeService;
 	
+	@RequestMapping(value = "/users/login", method = RequestMethod.GET)
+	public ResponseEntity<IsUserFoundReply> findExistingUserAndLogin(@RequestParam String username, @RequestParam String password){
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json");
+		return new ResponseEntity<IsUserFoundReply>(homeService.findExistingUserAndLogin(new UserCredentials(username, password)), header, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/users/logout", method = RequestMethod.GET)
+	public ResponseEntity<IsUserFoundReply> findExistingUserAndLogout(@RequestParam String username, @RequestParam String password){
+		HttpHeaders header = new HttpHeaders();
+		header.add("Content-Type", "application/json");
+		return new ResponseEntity<IsUserFoundReply>(homeService.findExistingUserAndLogout(new UserCredentials(username, password)), header, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/users/", method = RequestMethod.POST)
-	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUserDetails backgammonUser, Errors errors){
+	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUser backgammonUser, Errors errors){
 		if(errors.hasErrors()){
 			logger.info("Some errors occured while trying to bind backgammon user");
 			logger.info("There are " + errors.getErrorCount() + " errors.");
@@ -68,7 +82,9 @@ public class UsersController {
 				HttpHeaders header = new HttpHeaders();
 				header.add("Content-Type", "application/json");
 				ObjectMapper mapper = new ObjectMapper();
-				return new ResponseEntity<String>(mapper.writeValueAsString(backgammonUser), header, HttpStatus.CREATED);
+				
+				BackgammonUser user = new BackgammonUser(backgammonUser.getUserName(), backgammonUser.getPassword(), backgammonUser.getFirstName(), backgammonUser.getLastName(), backgammonUser.getEmail(), Status.LoggedIn, Arrays.asList("user"));
+				return new ResponseEntity<String>(mapper.writeValueAsString(user), header, HttpStatus.CREATED);
 			}
 			else{
 				HttpHeaders header = new HttpHeaders();

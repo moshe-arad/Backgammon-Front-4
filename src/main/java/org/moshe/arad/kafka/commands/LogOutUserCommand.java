@@ -1,7 +1,9 @@
 package org.moshe.arad.kafka.commands;
 
 import org.moshe.arad.entities.BackgammonUser;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LogOutUserCommand extends Command {
 
 	private BackgammonUser backgammonUser;

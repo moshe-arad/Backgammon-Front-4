@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.moshe.arad.entities.BackgammonUser;
-import org.moshe.arad.entities.BackgammonUserDetails;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 

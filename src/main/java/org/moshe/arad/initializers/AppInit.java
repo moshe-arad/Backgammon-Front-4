@@ -10,8 +10,10 @@ import javax.annotation.Resource;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
 import org.moshe.arad.kafka.consumers.config.LogInUserAckEventConfig;
+import org.moshe.arad.kafka.consumers.config.LogOutUserAckEventConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.consumers.events.LogInUserAckEventConsumer;
+import org.moshe.arad.kafka.consumers.events.LogOutUserAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.NewUserCreatedAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserEmailAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserNameAckEventConsumer;
@@ -46,6 +48,11 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	@Autowired
 	private LogInUserAckEventConfig logInUserAckEventConfig;
 	
+	private LogOutUserAckEventConsumer logOutUserAckEventConsumer;
+	
+	@Autowired
+	private LogOutUserAckEventConfig logOutUserAckEventConfig;
+	
 	private ExecutorService executor = Executors.newFixedThreadPool(6);
 	
 	private Logger logger = LoggerFactory.getLogger(AppInit.class);
@@ -70,6 +77,7 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			userEmailAvailabilityCheckedEventConsumer = context.getBean(UserEmailAckEventConsumer.class);
 			newUserCreatedAckEventConsumer = context.getBean(NewUserCreatedAckEventConsumer.class);
 			logInUserAckEventConsumer = context.getBean(LogInUserAckEventConsumer.class);
+			logOutUserAckEventConsumer = context.getBean(LogOutUserAckEventConsumer.class);
 			
 			logger.info("Initializing user name availability checked event consumer...");		
 			initSingleConsumer(userNameAvailabilityCheckedEventConsumer, KafkaUtils.USER_NAME_AVAILABILITY_CHECKED_EVENT_TOPIC, userNameAvailabilityCheckedEventConfig);		
@@ -84,11 +92,14 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			logger.info("Initialize new user created ack event consumer, completed...");
 			
 			initSingleConsumer(logInUserAckEventConsumer, KafkaUtils.LOG_IN_USER_ACK_EVENT_TOPIC, logInUserAckEventConfig);
+
+			initSingleConsumer(logOutUserAckEventConsumer, KafkaUtils.LOG_OUT_USER_ACK_EVENT_TOPIC, logOutUserAckEventConfig);
 			
 			executeProducersAndConsumers(Arrays.asList(userEmailAvailabilityCheckedEventConsumer,
 					userNameAvailabilityCheckedEventConsumer, 
 					newUserCreatedAckEventConsumer,
-					logInUserAckEventConsumer));
+					logInUserAckEventConsumer,
+					logOutUserAckEventConsumer));
 		}
 	}	
 

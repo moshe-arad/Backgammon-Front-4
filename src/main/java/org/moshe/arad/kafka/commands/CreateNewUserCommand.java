@@ -2,7 +2,7 @@ package org.moshe.arad.kafka.commands;
 
 import java.util.UUID;
 
-import org.moshe.arad.entities.BackgammonUserDetails;
+import org.moshe.arad.entities.BackgammonUser;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class CreateNewUserCommand extends Command{
 
-	private BackgammonUserDetails backgammonUser;
+	private BackgammonUser backgammonUser;
 	
 	public CreateNewUserCommand() {
 	}
 	
-	public CreateNewUserCommand(UUID uuid, BackgammonUserDetails backgammonUser) {
+	public CreateNewUserCommand(UUID uuid, BackgammonUser backgammonUser) {
 		super(uuid);
 		this.backgammonUser = backgammonUser;
 	}
@@ -25,11 +25,11 @@ public class CreateNewUserCommand extends Command{
 		return "CreateNewUserCommand [backgammonUser=" + backgammonUser + "]";
 	}
 
-	public BackgammonUserDetails getBackgammonUser() {
+	public BackgammonUser getBackgammonUser() {
 		return backgammonUser;
 	}
 
-	public void setBackgammonUser(BackgammonUserDetails backgammonUser) {
+	public void setBackgammonUser(BackgammonUser backgammonUser) {
 		this.backgammonUser = backgammonUser;
 	}
 
