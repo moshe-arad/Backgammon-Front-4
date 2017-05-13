@@ -52,9 +52,6 @@ public class HomeService implements ApplicationContextAware {
 	@Autowired
 	private EventsPool eventsPool;	
 	
-//	@Autowired
-//	private IBackgammonUserRepository backgammonUserRepository;	
-	
 	private ApplicationContext context;
 	
 	private Logger logger = LoggerFactory.getLogger(HomeService.class);
@@ -131,7 +128,7 @@ public class HomeService implements ApplicationContextAware {
 		synchronized (Thread.currentThread()) {
 			
 			try {
-				Thread.currentThread().wait(5000);
+				Thread.currentThread().wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -232,13 +229,6 @@ public class HomeService implements ApplicationContextAware {
 		createNewUserCommand.setBackgammonUser(backgammonUser);
 		return createNewUserCommand;
 	}
-
-//	private void saveUserAndAuthenticate(BackgammonUserDetails backgammonUser) {
-//		backgammonUser.setEnabled(true);
-//		backgammonUserRepository.save(backgammonUser);
-//		authenticateUser(backgammonUser);
-//		logger.info("User saved to local DB, and authenticated.");
-//	}
 	
 	private CheckUserNameCommand getUserNameCommand(String userName) {
 		CheckUserNameCommand checkUserNameAvailabilityCommand = context.getBean(CheckUserNameCommand.class);			
@@ -251,12 +241,6 @@ public class HomeService implements ApplicationContextAware {
 		checkUserEmailAvailabilityCommand.setEmail(email);
 		return checkUserEmailAvailabilityCommand;
 	}	
-	
-//	private void authenticateUser(BackgammonUserDetails backgammonUser) {
-//		Authentication auth = new UsernamePasswordAuthenticationToken(backgammonUser, 
-//				backgammonUser.getPassword(), backgammonUser.getAuthorities()); 
-//		SecurityContextHolder.getContext().setAuthentication(auth);
-//	}
 
 	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {		
