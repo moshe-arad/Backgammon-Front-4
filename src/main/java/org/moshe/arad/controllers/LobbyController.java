@@ -1,8 +1,8 @@
 package org.moshe.arad.controllers;
 
+import java.io.IOException;
+
 import org.moshe.arad.replies.IsGameRoomOpen;
-import org.moshe.arad.replies.IsUserFoundReply;
-import org.moshe.arad.requests.UserCredentials;
 import org.moshe.arad.services.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/lobby")
@@ -28,6 +30,16 @@ public class LobbyController {
 	public ResponseEntity<IsGameRoomOpen> openNewGameRoom(@RequestBody String username){
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json");
-		return new ResponseEntity<IsGameRoomOpen>(lobbyService.openNewGameRoom(username), header, HttpStatus.CREATED);
+		ObjectMapper objectMapper = new ObjectMapper();
+		String userNameFromJson = null;
+		try {
+			userNameFromJson = objectMapper.readTree(username).path("username").asText();
+		} catch (IOException e) {			
+			e.printStackTrace();
+		}
+		IsGameRoomOpen isGameRoomOpen = lobbyService.openNewGameRoom(userNameFromJson);
+		if(isGameRoomOpen.isGameRoomOpen()) return new ResponseEntity<IsGameRoomOpen>(isGameRoomOpen, header, HttpStatus.CREATED);
+		else return new ResponseEntity<IsGameRoomOpen>(isGameRoomOpen, header, HttpStatus.OK);
+		
 	}
 }
