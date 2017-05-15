@@ -43,7 +43,7 @@ public class LobbyService {
 		synchronized (Thread.currentThread()) {
 			
 			try {
-				Thread.currentThread().wait(5000);
+				Thread.currentThread().wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();				
 			}
