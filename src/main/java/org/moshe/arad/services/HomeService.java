@@ -87,28 +87,31 @@ public class HomeService implements ApplicationContextAware {
 			return result;
 		}
 		else{
-			try{
-				logger.info("User was found...");
-				logger.info("Sending logged in event to mongo and lobby...");
-				SimpleEventsProducer<LoggedInEvent> loggedInEventProducer = context.getBean(SimpleEventsProducer.class);
-				loggedInEventProducer.setTopic(KafkaUtils.LOGGED_IN_EVENT_TOPIC);
-				LoggedInEvent loggedInEvent = context.getBean(LoggedInEvent.class);
-				loggedInEvent.setUuid(uuid);
-				loggedInEvent.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
-				loggedInEvent.setArrived(new Date());
-				loggedInEvent.setClazz("LoggedInEvent");
-				loggedInEventProducer.sendKafkaMessage(loggedInEvent);
-				logger.info("logged in event was sent successfuly to mongo and lobby...");
-				result.setIsUserFound(true);
-				result.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
-				result.getBackgammonUser().setUser_permissions(Arrays.asList("user"));
-				return result;
-			}
-			catch (Exception e) {				
-				e.printStackTrace();
-			}
+			result.setIsUserFound(true);
+			result.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
+			result.getBackgammonUser().setUser_permissions(Arrays.asList("user"));
+			return result;
+//			try{
+//				logger.info("User was found...");
+//				logger.info("Sending logged in event to mongo and lobby...");
+//				SimpleEventsProducer<LoggedInEvent> loggedInEventProducer = context.getBean(SimpleEventsProducer.class);
+//				loggedInEventProducer.setTopic(KafkaUtils.LOGGED_IN_EVENT_TOPIC);
+//				LoggedInEvent loggedInEvent = context.getBean(LoggedInEvent.class);
+//				loggedInEvent.setUuid(uuid);
+//				loggedInEvent.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
+//				loggedInEvent.setArrived(new Date());
+//				loggedInEvent.setClazz("LoggedInEvent");
+//				loggedInEventProducer.sendKafkaMessage(loggedInEvent);
+//				logger.info("logged in event was sent successfuly to mongo and lobby...");
+//				result.setIsUserFound(true);
+//				result.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
+//				result.getBackgammonUser().setUser_permissions(Arrays.asList("user"));
+//				return result;
+//			}
+//			catch (Exception e) {				
+//				e.printStackTrace();
+//			}
 		}
-		return result;
 	}
 	
 	public IsUserFoundReply findExistingUserAndLogout(UserCredentials userCredentials) {
