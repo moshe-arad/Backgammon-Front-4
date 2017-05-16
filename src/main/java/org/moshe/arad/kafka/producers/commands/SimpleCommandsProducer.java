@@ -2,9 +2,11 @@ package org.moshe.arad.kafka.producers.commands;
 
 import java.util.UUID;
 
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.moshe.arad.kafka.commands.ICommand;
 import org.moshe.arad.kafka.producers.config.SimpleProducerConfig;
 import org.slf4j.Logger;
@@ -68,7 +70,15 @@ public class SimpleCommandsProducer <T extends ICommand> implements ISimpleComma
 		String commandJsonBlob = convertCommandIntoJsonBlob(command);
 		logger.info("Sending message to topic = " + topic + ", JSON message = " + commandJsonBlob + ".");
 		ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, commandJsonBlob);
-		producer.send(record);
+		producer.send(record, new Callback() {
+			
+			@Override
+			public void onCompletion(RecordMetadata arg0, Exception ex) {
+				if (ex != null) {
+		        	ex.printStackTrace(); 
+		        }				
+			}
+		});
 		logger.info("Message sent.");
 		producer.close();
 		logger.info("Kafka producer closed.");

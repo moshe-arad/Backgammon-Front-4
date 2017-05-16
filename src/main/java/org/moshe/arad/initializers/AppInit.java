@@ -66,7 +66,7 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	
 	private ApplicationContext context;
 	
-	public static final int NUM_CONSUMERS = 3;
+	public static final int NUM_CONSUMERS = 5;
 	
 	public AppInit() {
 		
