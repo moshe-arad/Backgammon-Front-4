@@ -2,6 +2,7 @@ package org.moshe.arad.controllers;
 
 import java.io.IOException;
 
+import org.moshe.arad.replies.IsGameRoomDeleted;
 import org.moshe.arad.replies.IsGameRoomOpen;
 import org.moshe.arad.services.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +42,20 @@ public class LobbyController {
 		if(isGameRoomOpen.isGameRoomOpen()) return new ResponseEntity<IsGameRoomOpen>(isGameRoomOpen, header, HttpStatus.CREATED);
 		else return new ResponseEntity<IsGameRoomOpen>(isGameRoomOpen, header, HttpStatus.OK);
 		
+	}
+	
+	@RequestMapping(value = "/room/close", consumes="application/json", method = RequestMethod.DELETE, produces = "application/json")
+	public ResponseEntity<IsGameRoomDeleted> closeGameRoom(@RequestBody String username){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		ObjectMapper objectMapper = new ObjectMapper();
+		String userNameFromJson = null;
+		try {
+			userNameFromJson = objectMapper.readTree(username).path("username").asText();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		IsGameRoomDeleted isGameRoomDeleted = lobbyService.closeGameRoomOpenedBy(userNameFromJson);
+		return new ResponseEntity<IsGameRoomDeleted>(isGameRoomDeleted, headers, HttpStatus.OK);
 	}
 }

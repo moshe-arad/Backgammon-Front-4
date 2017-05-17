@@ -9,10 +9,12 @@ import javax.annotation.Resource;
 
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
+import org.moshe.arad.kafka.consumers.config.CloseGameRoomEventAckConfig;
 import org.moshe.arad.kafka.consumers.config.LogInUserAckEventConfig;
 import org.moshe.arad.kafka.consumers.config.LogOutUserAckEventConfig;
 import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventAckConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
+import org.moshe.arad.kafka.consumers.events.CloseGameRoomEventAckConsumer;
 import org.moshe.arad.kafka.consumers.events.LogInUserAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.LogOutUserAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.NewGameRoomOpenedEventAckConsumer;
@@ -60,6 +62,11 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	@Autowired
 	private NewGameRoomOpenedEventAckConfig newGameRoomOpenedEventAckConfig;
 	
+	private CloseGameRoomEventAckConsumer closeGameRoomEventAckConsumer;
+	
+	@Autowired
+	private CloseGameRoomEventAckConfig closeGameRoomEventAckConfig;
+	
 	private ExecutorService executor = Executors.newFixedThreadPool(6);
 	
 	private Logger logger = LoggerFactory.getLogger(AppInit.class);
@@ -86,6 +93,7 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			logInUserAckEventConsumer = context.getBean(LogInUserAckEventConsumer.class);
 			logOutUserAckEventConsumer = context.getBean(LogOutUserAckEventConsumer.class);
 			newGameRoomOpenedEventAckConsumer = context.getBean(NewGameRoomOpenedEventAckConsumer.class);
+			closeGameRoomEventAckConsumer = context.getBean(CloseGameRoomEventAckConsumer.class);
 			
 			logger.info("Initializing user name availability checked event consumer...");		
 			initSingleConsumer(userNameAvailabilityCheckedEventConsumer, KafkaUtils.USER_NAME_AVAILABILITY_CHECKED_EVENT_TOPIC, userNameAvailabilityCheckedEventConfig);		
@@ -105,12 +113,15 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 						
 			initSingleConsumer(newGameRoomOpenedEventAckConsumer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_ACK_TOPIC, newGameRoomOpenedEventAckConfig);
 			
+			initSingleConsumer(closeGameRoomEventAckConsumer, KafkaUtils.CLOSE_GAME_ROOM_EVENT_ACK_TOPIC, closeGameRoomEventAckConfig);
+			
 			executeProducersAndConsumers(Arrays.asList(userEmailAvailabilityCheckedEventConsumer,
 					userNameAvailabilityCheckedEventConsumer, 
 					newUserCreatedAckEventConsumer,
 					logInUserAckEventConsumer,
 					logOutUserAckEventConsumer,
-					newGameRoomOpenedEventAckConsumer));
+					newGameRoomOpenedEventAckConsumer,
+					closeGameRoomEventAckConsumer));
 		}
 	}	
 
