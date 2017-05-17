@@ -91,26 +91,6 @@ public class HomeService implements ApplicationContextAware {
 			result.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
 			result.getBackgammonUser().setUser_permissions(Arrays.asList("user"));
 			return result;
-//			try{
-//				logger.info("User was found...");
-//				logger.info("Sending logged in event to mongo and lobby...");
-//				SimpleEventsProducer<LoggedInEvent> loggedInEventProducer = context.getBean(SimpleEventsProducer.class);
-//				loggedInEventProducer.setTopic(KafkaUtils.LOGGED_IN_EVENT_TOPIC);
-//				LoggedInEvent loggedInEvent = context.getBean(LoggedInEvent.class);
-//				loggedInEvent.setUuid(uuid);
-//				loggedInEvent.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
-//				loggedInEvent.setArrived(new Date());
-//				loggedInEvent.setClazz("LoggedInEvent");
-//				loggedInEventProducer.sendKafkaMessage(loggedInEvent);
-//				logger.info("logged in event was sent successfuly to mongo and lobby...");
-//				result.setIsUserFound(true);
-//				result.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
-//				result.getBackgammonUser().setUser_permissions(Arrays.asList("user"));
-//				return result;
-//			}
-//			catch (Exception e) {				
-//				e.printStackTrace();
-//			}
 		}
 	}
 	
@@ -140,14 +120,6 @@ public class HomeService implements ApplicationContextAware {
 		LogOutUserAckEvent logOutUserAckEvent = (LogOutUserAckEvent) eventsPool.takeEventFromPoll(uuid);
 		
 		if(logOutUserAckEvent.isUserFound()){
-			LoggedOutEvent loggedOutEvent = context.getBean(LoggedOutEvent.class);
-			loggedOutEvent.setArrived(new Date());
-			loggedOutEvent.setClazz("LoggedOutEvent");
-			loggedOutEvent.setBackgammonUser(logOutUserAckEvent.getBackgammonUser());
-			
-			loggedOutEventProducer.setTopic(KafkaUtils.LOGGED_OUT_EVENT_TOPIC);
-			loggedOutEventProducer.sendKafkaMessage(loggedOutEvent);
-			
 			result.setIsUserFound(true);
 			result.setBackgammonUser(logOutUserAckEvent.getBackgammonUser());			
 		}
