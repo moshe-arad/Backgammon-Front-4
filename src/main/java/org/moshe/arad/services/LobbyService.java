@@ -4,14 +4,17 @@ import java.util.UUID;
 
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
+import org.moshe.arad.kafka.commands.AddUserAsWatcherCommand;
 import org.moshe.arad.kafka.commands.CloseGameRoomCommand;
 import org.moshe.arad.kafka.commands.OpenNewGameRoomCommand;
 import org.moshe.arad.kafka.events.CloseGameRoomEventAck;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
+import org.moshe.arad.kafka.events.UserAddedAsWatcherEventAck;
 import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
 import org.moshe.arad.replies.IsGameRoomDeleted;
 import org.moshe.arad.replies.IsGameRoomOpen;
+import org.moshe.arad.replies.IsUserAddedAsWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,9 @@ public class LobbyService {
 	
 	@Autowired
 	private SimpleCommandsProducer<CloseGameRoomCommand> closeGameRoomCommandProducer;
+	
+	@Autowired
+	private SimpleCommandsProducer<AddUserAsWatcherCommand> addUserAsWatcherCommandProducer;
 	
 	@Autowired
 	private ApplicationContext context;
@@ -91,6 +97,35 @@ public class LobbyService {
 		else isGameRoomDeleted.setGameRoomDeleted(false);
 		
 		return isGameRoomDeleted;
+	}
+
+	public IsUserAddedAsWatcher addWatcherToGameRoom(String userNameFromJson, String gameRoomNameFromJson) {
+		logger.info("Preparing an add user as watcher command...");
+		
+		AddUserAsWatcherCommand addUserAsWatcherCommand = context.getBean(AddUserAsWatcherCommand.class);
+		addUserAsWatcherCommand.setUsername(userNameFromJson);
+		addUserAsWatcherCommand.setGameRoomName(gameRoomNameFromJson);
+		
+		addUserAsWatcherCommandProducer.setTopic(KafkaUtils.ADD_USER_AS_WATCHER_COMMAND_TOPIC);
+		UUID uuid = addUserAsWatcherCommandProducer.sendKafkaMessage(addUserAsWatcherCommand);
+		
+		eventsPool.getUserWatcherLockers().put(uuid.toString(), Thread.currentThread());
+		
+		synchronized (Thread.currentThread()) {
+			try {
+				Thread.currentThread().wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		UserAddedAsWatcherEventAck userAddedAsWatcherEventAck = (UserAddedAsWatcherEventAck) eventsPool.takeEventFromPoll(uuid);
+		IsUserAddedAsWatcher isUserAddedAsWatcher = context.getBean(IsUserAddedAsWatcher.class);
+		isUserAddedAsWatcher.setGameRoom(userAddedAsWatcherEventAck.getGameRoom());
+		if(isUserAddedAsWatcher.isUserAddedAsWatcher()) isUserAddedAsWatcher.setUserAddedAsWatcher(true);
+		else isUserAddedAsWatcher.setUserAddedAsWatcher(false);
+		
+		return isUserAddedAsWatcher;
 	}
 
 }

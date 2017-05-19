@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.moshe.arad.replies.IsGameRoomDeleted;
 import org.moshe.arad.replies.IsGameRoomOpen;
+import org.moshe.arad.replies.IsUserAddedAsWatcher;
 import org.moshe.arad.services.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -57,5 +58,22 @@ public class LobbyController {
 		}
 		IsGameRoomDeleted isGameRoomDeleted = lobbyService.closeGameRoomOpenedBy(userNameFromJson);
 		return new ResponseEntity<IsGameRoomDeleted>(isGameRoomDeleted, headers, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/room/watcher", consumes = "application/json", method = RequestMethod.PUT, produces="application/json")
+	public ResponseEntity<IsUserAddedAsWatcher> addWatcherToGameRoom(@RequestBody String body){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		ObjectMapper objectMapper = new ObjectMapper();
+		String userNameFromJson = null;
+		String gameRoomNameFromJson = null;
+		try {
+			userNameFromJson = objectMapper.readTree(body).path("username").asText();
+			gameRoomNameFromJson = objectMapper.readTree(body).path("gameRoomName").asText();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		IsUserAddedAsWatcher isUserAddedAsWatcher = lobbyService.addWatcherToGameRoom(userNameFromJson, gameRoomNameFromJson);
+		return new ResponseEntity<IsUserAddedAsWatcher>(isUserAddedAsWatcher, headers, HttpStatus.OK);
 	}
 }
