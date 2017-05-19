@@ -6,12 +6,15 @@ import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.AddUserAsWatcherCommand;
 import org.moshe.arad.kafka.commands.CloseGameRoomCommand;
+import org.moshe.arad.kafka.commands.GetAllGameRoomsCommand;
 import org.moshe.arad.kafka.commands.OpenNewGameRoomCommand;
 import org.moshe.arad.kafka.events.CloseGameRoomEventAck;
+import org.moshe.arad.kafka.events.GetAllGameRoomsAckEvent;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.kafka.events.UserAddedAsWatcherEventAck;
 import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
+import org.moshe.arad.replies.GameRoomsPayload;
 import org.moshe.arad.replies.IsGameRoomDeleted;
 import org.moshe.arad.replies.IsGameRoomOpen;
 import org.moshe.arad.replies.IsUserAddedAsWatcher;
@@ -32,6 +35,9 @@ public class LobbyService {
 	
 	@Autowired
 	private SimpleCommandsProducer<AddUserAsWatcherCommand> addUserAsWatcherCommandProducer;
+	
+	@Autowired
+	private SimpleCommandsProducer<GetAllGameRoomsCommand> getAllGameRoomsCommandProducer;
 	
 	@Autowired
 	private ApplicationContext context;
@@ -126,6 +132,30 @@ public class LobbyService {
 		else isUserAddedAsWatcher.setUserAddedAsWatcher(false);
 		
 		return isUserAddedAsWatcher;
+	}
+
+	public GameRoomsPayload getAllGameRooms() {
+		logger.info("Preparing a get all game rooms command...");
+		
+		GetAllGameRoomsCommand getAllGameRoomsCommand = context.getBean(GetAllGameRoomsCommand.class);
+		
+		getAllGameRoomsCommandProducer.setTopic(KafkaUtils.GET_ALL_GAME_ROOMS_COMMAND_TOPIC);
+		UUID uuid = getAllGameRoomsCommandProducer.sendKafkaMessage(getAllGameRoomsCommand);
+		
+		eventsPool.getGetRoomsLockers().put(uuid.toString(), Thread.currentThread());
+		
+		synchronized (Thread.currentThread()) {
+			try {
+				Thread.currentThread().wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		GetAllGameRoomsAckEvent getAllGameRoomsAckEvent = (GetAllGameRoomsAckEvent) eventsPool.takeEventFromPoll(uuid);
+		GameRoomsPayload gameRoomsPayload = context.getBean(GameRoomsPayload.class);
+		gameRoomsPayload.setGameRooms(getAllGameRoomsAckEvent.getGameRooms());
+		return gameRoomsPayload; 
 	}
 
 }

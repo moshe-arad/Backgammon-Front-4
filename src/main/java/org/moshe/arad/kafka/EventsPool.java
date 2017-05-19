@@ -31,6 +31,7 @@ public class EventsPool {
 	private Map<String, Thread> openNewGameRoomLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> closeGameRoomLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> userWatcherLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> getRoomsLockers = new HashMap<>(POOL_SIZE);
 	
 	public boolean addEventToPool(BackgammonEvent event){
 		return events.add(event);
@@ -139,5 +140,13 @@ public class EventsPool {
 
 	public void setUserWatcherLockers(Map<String, Thread> userWatcherLockers) {
 		this.userWatcherLockers = userWatcherLockers;
+	}
+
+	public Map<String, Thread> getGetRoomsLockers() {
+		return getRoomsLockers;
+	}
+
+	public void setGetRoomsLockers(Map<String, Thread> getRoomsLockers) {
+		this.getRoomsLockers = getRoomsLockers;
 	}
 }

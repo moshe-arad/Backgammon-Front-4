@@ -2,6 +2,7 @@ package org.moshe.arad.controllers;
 
 import java.io.IOException;
 
+import org.moshe.arad.replies.GameRoomsPayload;
 import org.moshe.arad.replies.IsGameRoomDeleted;
 import org.moshe.arad.replies.IsGameRoomOpen;
 import org.moshe.arad.replies.IsUserAddedAsWatcher;
@@ -75,5 +76,14 @@ public class LobbyController {
 		}
 		IsUserAddedAsWatcher isUserAddedAsWatcher = lobbyService.addWatcherToGameRoom(userNameFromJson, gameRoomNameFromJson);
 		return new ResponseEntity<IsUserAddedAsWatcher>(isUserAddedAsWatcher, headers, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/room/all", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<GameRoomsPayload> getAllGameRooms(){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		
+		GameRoomsPayload gameRoomsPayload = lobbyService.getAllGameRooms();
+		return new ResponseEntity<GameRoomsPayload>(gameRoomsPayload, headers, HttpStatus.OK);
 	}
 }
