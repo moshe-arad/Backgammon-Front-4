@@ -1,5 +1,6 @@
 package org.moshe.arad.controllers;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import javax.validation.Valid;
@@ -39,21 +40,43 @@ public class UsersController {
 	@Autowired
 	private HomeService homeService;
 	
-	@RequestMapping(value = "/users/login", method = RequestMethod.GET)
-	public ResponseEntity<IsUserFoundReply> findExistingUserAndLogin(@RequestParam String username, @RequestParam String password){
+	@RequestMapping(value = "/users/login", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
+	public ResponseEntity<IsUserFoundReply> findExistingUserAndLogin(@RequestBody String body){
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json");
-		return new ResponseEntity<IsUserFoundReply>(homeService.findExistingUserAndLogin(new UserCredentials(username, password)), header, HttpStatus.OK);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		String userNameFromJson = null;
+		String passwordFromJson = null;
+		try {
+			userNameFromJson = objectMapper.readTree(body).path("username").asText();
+			passwordFromJson = objectMapper.readTree(body).path("password").asText();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<IsUserFoundReply>(homeService.findExistingUserAndLogin(new UserCredentials(userNameFromJson, passwordFromJson)), header, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/users/logout", method = RequestMethod.GET)
-	public ResponseEntity<IsUserFoundReply> findExistingUserAndLogout(@RequestParam String username, @RequestParam String password){
+	@RequestMapping(value = "/users/logout", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
+	public ResponseEntity<IsUserFoundReply> findExistingUserAndLogout(@RequestBody String body){
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json");
-		return new ResponseEntity<IsUserFoundReply>(homeService.findExistingUserAndLogout(new UserCredentials(username, password)), header, HttpStatus.OK);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		String userNameFromJson = null;
+		String passwordFromJson = null;
+		try {
+			userNameFromJson = objectMapper.readTree(body).path("username").asText();
+			passwordFromJson = objectMapper.readTree(body).path("password").asText();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<IsUserFoundReply>(homeService.findExistingUserAndLogout(new UserCredentials(userNameFromJson, passwordFromJson)), header, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/users/", method = RequestMethod.POST)
+	@RequestMapping(value = "/users/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
 	public ResponseEntity<String> createNewUser(@Valid @RequestBody BackgammonUser backgammonUser, Errors errors){
 		if(errors.hasErrors()){
 			logger.info("Some errors occured while trying to bind backgammon user");
@@ -103,7 +126,9 @@ public class UsersController {
 		}
 	}
 	
-	@RequestMapping(value = "/users/user_name/{userName}/", method = RequestMethod.GET)
+	// #### To view Service ####
+	
+	@RequestMapping(value = "/users/user_name/{userName}/", method = RequestMethod.GET, consumes = "application/json", produces = "application/json")
 	public UserNameAvailabilityMessage isUserNameAvailable(@PathVariable String userName){
 		boolean isAvailable = false;
 		
@@ -121,7 +146,7 @@ public class UsersController {
 		}
 	}
 	
-	@RequestMapping(value = "/users/email/{email}/", method = RequestMethod.GET)
+	@RequestMapping(value = "/users/email/{email}/", method = RequestMethod.GET, consumes = "application/json", produces = "application/json")
 	public EmailAvailabilityMessage isUserEmailAvailable(@PathVariable String email){
 		boolean isAvailable = false;
 		

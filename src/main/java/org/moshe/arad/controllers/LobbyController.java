@@ -78,6 +78,8 @@ public class LobbyController {
 		return new ResponseEntity<IsUserAddedAsWatcher>(isUserAddedAsWatcher, headers, HttpStatus.OK);
 	}
 	
+	// #### To view Service ####
+	
 	@RequestMapping(value = "/room/all", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<GameRoomsPayload> getAllGameRooms(){
 		HttpHeaders headers = new HttpHeaders();
