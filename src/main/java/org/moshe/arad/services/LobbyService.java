@@ -128,7 +128,7 @@ public class LobbyService {
 		UserAddedAsWatcherEventAck userAddedAsWatcherEventAck = (UserAddedAsWatcherEventAck) eventsPool.takeEventFromPoll(uuid);
 		IsUserAddedAsWatcher isUserAddedAsWatcher = context.getBean(IsUserAddedAsWatcher.class);
 		isUserAddedAsWatcher.setGameRoom(userAddedAsWatcherEventAck.getGameRoom());
-		if(isUserAddedAsWatcher.isUserAddedAsWatcher()) isUserAddedAsWatcher.setUserAddedAsWatcher(true);
+		if(userAddedAsWatcherEventAck.isUserAddedAsWatcher()) isUserAddedAsWatcher.setUserAddedAsWatcher(true);
 		else isUserAddedAsWatcher.setUserAddedAsWatcher(false);
 		
 		return isUserAddedAsWatcher;
