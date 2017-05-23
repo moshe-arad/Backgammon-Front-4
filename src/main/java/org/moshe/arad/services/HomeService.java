@@ -94,38 +94,13 @@ public class HomeService implements ApplicationContextAware {
 		}
 	}
 	
-	public IsUserFoundReply findExistingUserAndLogout(UserCredentials userCredentials) {
-		IsUserFoundReply result = new IsUserFoundReply();
-		
-		BackgammonUser backgammonUser = new BackgammonUser(userCredentials.getUsername(), userCredentials.getPassword(), "", "", "", null);
-		
-		LogOutUserCommand logOutUserCommand = context.getBean(LogOutUserCommand.class);
-		
+	public void findExistingUserAndLogout(UserCredentials userCredentials) {
+		BackgammonUser backgammonUser = new BackgammonUser(userCredentials.getUsername(), userCredentials.getPassword(), "", "", "", null);		
+		LogOutUserCommand logOutUserCommand = context.getBean(LogOutUserCommand.class);		
 		logOutUserCommand.setBackgammonUser(backgammonUser);
 		
 		logOutUserCommandProducer.setTopic(KafkaUtils.LOG_OUT_USER_COMMAND_TOPIC);
-		UUID uuid = logOutUserCommandProducer.sendKafkaMessage(logOutUserCommand);
-		
-		eventsPool.getUserLogOutLockers().put(uuid.toString(), Thread.currentThread());
-		
-		synchronized (Thread.currentThread()) {
-			
-			try {
-				Thread.currentThread().wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		LogOutUserAckEvent logOutUserAckEvent = (LogOutUserAckEvent) eventsPool.takeEventFromPoll(uuid);
-		
-		if(logOutUserAckEvent.isUserFound()){
-			result.setIsUserFound(true);
-			result.setBackgammonUser(logOutUserAckEvent.getBackgammonUser());			
-		}
-		else result.setIsUserFound(false);
-		
-		return result;
+		logOutUserCommandProducer.sendKafkaMessage(logOutUserCommand);
 	}
 	
 	public boolean isUserNameAvailable(String userName){

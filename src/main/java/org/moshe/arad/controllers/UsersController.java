@@ -52,7 +52,7 @@ public class UsersController {
 	}
 	
 	@RequestMapping(value = "/users/logout", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
-	public ResponseEntity<IsUserFoundReply> findExistingUserAndLogout(@RequestBody String body){
+	public ResponseEntity<?> findExistingUserAndLogout(@RequestBody String body){
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json");
 		
@@ -66,7 +66,9 @@ public class UsersController {
 			e.printStackTrace();
 		}
 		
-		return new ResponseEntity<IsUserFoundReply>(homeService.findExistingUserAndLogout(new UserCredentials(userNameFromJson, passwordFromJson)), header, HttpStatus.OK);
+		homeService.findExistingUserAndLogout(new UserCredentials(userNameFromJson, passwordFromJson));
+		
+		return new ResponseEntity<>(header, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/users/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")

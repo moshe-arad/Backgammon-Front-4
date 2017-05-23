@@ -43,4 +43,7 @@ public class KafkaUtils {
 	public static final String GET_ALL_GAME_ROOMS_COMMAND_TOPIC = "Get-All-Game-Rooms-Command";
 	public static final String GET_ALL_GAME_ROOMS_EVENT_ACK_TOPIC = "Get-All-Game-Rooms-Event-Ack";
 	public static final String GET_ALL_GAME_ROOMS_EVENT_ACK_GROUP = "GetAllGameRoomsEventAck";
+	public static final String GET_LOBBY_UPDATE_VIEW_COMMAND_TOPIC = "Get-Lobby-Update-View-Command";
+	public static final String GET_LOBBY_UPDATE_VIEW_ACK_EVENT_GROUP = "GetLobbyUpdateViewAckEventGroup";
+	public static final String GET_LOBBY_UPDATE_VIEW_ACK_EVENT_TOPIC = "Get-Lobby-Update-View-Ack-Event";
 }

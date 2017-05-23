@@ -7,14 +7,17 @@ import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.AddUserAsWatcherCommand;
 import org.moshe.arad.kafka.commands.CloseGameRoomCommand;
 import org.moshe.arad.kafka.commands.GetAllGameRoomsCommand;
+import org.moshe.arad.kafka.commands.GetLobbyUpdateViewCommand;
 import org.moshe.arad.kafka.commands.OpenNewGameRoomCommand;
 import org.moshe.arad.kafka.events.CloseGameRoomEventAck;
 import org.moshe.arad.kafka.events.GetAllGameRoomsAckEvent;
+import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.kafka.events.UserAddedAsWatcherEventAck;
 import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
 import org.moshe.arad.replies.GameRoomsPayload;
+import org.moshe.arad.replies.GetLobbyUpdateViewReply;
 import org.moshe.arad.replies.IsGameRoomDeleted;
 import org.moshe.arad.replies.IsGameRoomOpen;
 import org.moshe.arad.replies.IsUserAddedAsWatcher;
@@ -38,6 +41,9 @@ public class LobbyService {
 	
 	@Autowired
 	private SimpleCommandsProducer<GetAllGameRoomsCommand> getAllGameRoomsCommandProducer;
+	
+	@Autowired
+	private SimpleCommandsProducer<GetLobbyUpdateViewCommand> getLobbyUpdateViewCommandProducer;
 	
 	@Autowired
 	private ApplicationContext context;
@@ -156,6 +162,29 @@ public class LobbyService {
 		GameRoomsPayload gameRoomsPayload = context.getBean(GameRoomsPayload.class);
 		gameRoomsPayload.setGameRooms(getAllGameRoomsAckEvent.getGameRooms());
 		return gameRoomsPayload; 
+	}
+
+	public GetLobbyUpdateViewReply getLobbyUpdateView() {
+		logger.info("Preparing a get Lobby Update view command...");
+		
+		GetLobbyUpdateViewCommand getLobbyUpdateViewCommand = context.getBean(GetLobbyUpdateViewCommand.class);
+		
+		getLobbyUpdateViewCommandProducer.setTopic(KafkaUtils.GET_LOBBY_UPDATE_VIEW_COMMAND_TOPIC);
+		UUID uuid = getLobbyUpdateViewCommandProducer.sendKafkaMessage(getLobbyUpdateViewCommand);
+		
+		eventsPool.getGetUpdateViewLockers().put(uuid.toString(), Thread.currentThread());
+		
+		synchronized (Thread.currentThread()) {
+			try {
+				Thread.currentThread().wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		GetLobbyUpdateViewAckEvent getLobbyUpdateViewAckEvent = (GetLobbyUpdateViewAckEvent) eventsPool.takeEventFromPoll(uuid);
+		GetLobbyUpdateViewReply getLobbyUpdateViewReply = new GetLobbyUpdateViewReply(getLobbyUpdateViewAckEvent);
+		return getLobbyUpdateViewReply;
 	}
 
 }

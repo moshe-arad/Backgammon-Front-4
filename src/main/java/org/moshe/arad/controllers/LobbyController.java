@@ -2,7 +2,9 @@ package org.moshe.arad.controllers;
 
 import java.io.IOException;
 
+import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
 import org.moshe.arad.replies.GameRoomsPayload;
+import org.moshe.arad.replies.GetLobbyUpdateViewReply;
 import org.moshe.arad.replies.IsGameRoomDeleted;
 import org.moshe.arad.replies.IsGameRoomOpen;
 import org.moshe.arad.replies.IsUserAddedAsWatcher;
@@ -87,5 +89,13 @@ public class LobbyController {
 		
 		GameRoomsPayload gameRoomsPayload = lobbyService.getAllGameRooms();
 		return new ResponseEntity<GameRoomsPayload>(gameRoomsPayload, headers, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/update/view", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<GetLobbyUpdateViewReply> getLobbyUpdateView(){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		
+		return new ResponseEntity<GetLobbyUpdateViewReply>(lobbyService.getLobbyUpdateView(), headers, HttpStatus.OK);
 	}
 }
