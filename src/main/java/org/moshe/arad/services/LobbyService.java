@@ -53,34 +53,14 @@ public class LobbyService {
 	
 	private Logger logger = LoggerFactory.getLogger(LobbyService.class);
 	
-	public IsGameRoomOpen openNewGameRoom(String username) {
+	public void openNewGameRoom(String username) {
 		
 		logger.info("Preparing an open new game room command...");
 		OpenNewGameRoomCommand openNewGameRoomCommand = context.getBean(OpenNewGameRoomCommand.class);
 		openNewGameRoomCommand.setUsername(username);
 		
 		openNewGameRoomCommandProducer.setTopic(KafkaUtils.OPEN_NEW_GAME_ROOM_COMMAND_TOPIC);
-		UUID uuid = openNewGameRoomCommandProducer.sendKafkaMessage(openNewGameRoomCommand);
-		
-		eventsPool.getOpenNewGameRoomLockers().put(uuid.toString(), Thread.currentThread());
-		
-		synchronized (Thread.currentThread()) {
-			
-			try {
-				Thread.currentThread().wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();				
-			}
-		}
-		
-		NewGameRoomOpenedEventAck newGameRoomOpenedEventAck = (NewGameRoomOpenedEventAck) eventsPool.takeEventFromPoll(uuid);
-		IsGameRoomOpen isGameRoomOpen = context.getBean(IsGameRoomOpen.class);
-		isGameRoomOpen.setGameRoom(newGameRoomOpenedEventAck.getGameRoom());
-		
-		if(newGameRoomOpenedEventAck.isGameRoomOpened()) isGameRoomOpen.setGameRoomOpen(true);
-		else isGameRoomOpen.setGameRoomOpen(false);
-		
-		return isGameRoomOpen;
+		openNewGameRoomCommandProducer.sendKafkaMessage(openNewGameRoomCommand);
 	}
 
 	public IsGameRoomDeleted closeGameRoomOpenedBy(String userNameFromJson) {

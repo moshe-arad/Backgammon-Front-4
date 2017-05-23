@@ -3,6 +3,7 @@ package org.moshe.arad.replies;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,6 +49,19 @@ public class GetLobbyUpdateViewReply {
 		while(it.hasNext()){
 			Map.Entry<Object,Object> entry = it.next();
 			this.deleteWatchers.add(new DeleteWatcherFrom(entry.getValue().toString(), entry.getKey().toString()));
+		}
+		
+		ListIterator<GameRoom> itList = getLobbyUpdateViewAckEvent.getGameRoomsAdd().listIterator();
+		
+		while(itList.hasNext()){
+			GameRoom room = itList.next();
+			this.gameRoomsAdd.add(room);
+		}
+		
+		ListIterator<String> itListDeleteRooms = getLobbyUpdateViewAckEvent.getGameRoomsDelete().listIterator();
+		
+		while(itListDeleteRooms.hasNext()){
+			this.gameRoomsDelete.add(itListDeleteRooms.next());
 		}
 	}
 

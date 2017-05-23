@@ -42,12 +42,14 @@ public class LobbyController {
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
-		IsGameRoomOpen isGameRoomOpen = lobbyService.openNewGameRoom(userNameFromJson);
-		if(isGameRoomOpen.isGameRoomOpen()) return new ResponseEntity<IsGameRoomOpen>(isGameRoomOpen, header, HttpStatus.CREATED);
-		else return new ResponseEntity<IsGameRoomOpen>(isGameRoomOpen, header, HttpStatus.OK);
+		
+		lobbyService.openNewGameRoom(userNameFromJson);
+		return new ResponseEntity<>(header, HttpStatus.CREATED);
 		
 	}
 	
+	//to use it on game page when want to exit, but redirect to lobby, instead of logout.
+	//TODO refactor this - do not use ack
 	@RequestMapping(value = "/room/close", consumes="application/json", method = RequestMethod.DELETE, produces = "application/json")
 	public ResponseEntity<IsGameRoomDeleted> closeGameRoom(@RequestBody String username){
 		HttpHeaders headers = new HttpHeaders();
