@@ -1,8 +1,5 @@
 package org.moshe.arad.kafka.commands;
 
-import java.util.UUID;
-
-import org.moshe.arad.entities.BackgammonUser;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -10,12 +7,27 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class GetLobbyUpdateViewCommand extends Command {
 
+	private String username;
+
 	public GetLobbyUpdateViewCommand() {
 	
+	}
+	
+	public GetLobbyUpdateViewCommand(String username) {
+		super();
+		this.username = username;
 	}
 
 	@Override
 	public String toString() {
-		return "GetLobbyUpdateViewCommand []";
+		return "GetLobbyUpdateViewCommand [username=" + username + "]";
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }

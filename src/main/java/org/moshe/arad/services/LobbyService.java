@@ -40,9 +40,6 @@ public class LobbyService {
 	private SimpleCommandsProducer<AddUserAsWatcherCommand> addUserAsWatcherCommandProducer;
 	
 	@Autowired
-	private SimpleCommandsProducer<GetAllGameRoomsCommand> getAllGameRoomsCommandProducer;
-	
-	@Autowired
 	private SimpleCommandsProducer<GetLobbyUpdateViewCommand> getLobbyUpdateViewCommandProducer;
 	
 	@Autowired
@@ -63,6 +60,7 @@ public class LobbyService {
 		openNewGameRoomCommandProducer.sendKafkaMessage(openNewGameRoomCommand);
 	}
 
+	@Deprecated
 	public IsGameRoomDeleted closeGameRoomOpenedBy(String userNameFromJson) {
 		logger.info("Preparing a close game room command...");
 		
@@ -120,34 +118,11 @@ public class LobbyService {
 		return isUserAddedAsWatcher;
 	}
 
-	public GameRoomsPayload getAllGameRooms() {
-		logger.info("Preparing a get all game rooms command...");
-		
-		GetAllGameRoomsCommand getAllGameRoomsCommand = context.getBean(GetAllGameRoomsCommand.class);
-		
-		getAllGameRoomsCommandProducer.setTopic(KafkaUtils.GET_ALL_GAME_ROOMS_COMMAND_TOPIC);
-		UUID uuid = getAllGameRoomsCommandProducer.sendKafkaMessage(getAllGameRoomsCommand);
-		
-		eventsPool.getGetRoomsLockers().put(uuid.toString(), Thread.currentThread());
-		
-		synchronized (Thread.currentThread()) {
-			try {
-				Thread.currentThread().wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-
-		GetAllGameRoomsAckEvent getAllGameRoomsAckEvent = (GetAllGameRoomsAckEvent) eventsPool.takeEventFromPoll(uuid);
-		GameRoomsPayload gameRoomsPayload = context.getBean(GameRoomsPayload.class);
-		gameRoomsPayload.setGameRooms(getAllGameRoomsAckEvent.getGameRooms());
-		return gameRoomsPayload; 
-	}
-
-	public GetLobbyUpdateViewReply getLobbyUpdateView() {
+	public GetLobbyUpdateViewReply getLobbyUpdateView(String username) {
 		logger.info("Preparing a get Lobby Update view command...");
 		
 		GetLobbyUpdateViewCommand getLobbyUpdateViewCommand = context.getBean(GetLobbyUpdateViewCommand.class);
+		getLobbyUpdateViewCommand.setUsername(username);
 		
 		getLobbyUpdateViewCommandProducer.setTopic(KafkaUtils.GET_LOBBY_UPDATE_VIEW_COMMAND_TOPIC);
 		UUID uuid = getLobbyUpdateViewCommandProducer.sendKafkaMessage(getLobbyUpdateViewCommand);

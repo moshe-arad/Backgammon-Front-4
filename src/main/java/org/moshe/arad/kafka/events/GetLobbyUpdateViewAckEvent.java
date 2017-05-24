@@ -1,5 +1,6 @@
 package org.moshe.arad.kafka.events;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +15,11 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class GetLobbyUpdateViewAckEvent extends BackgammonEvent{
 
-	private List<GameRoom> gameRoomsAdd;
-	private List<String> gameRoomsDelete;
-	private Map<Object,Object> addWatchers;
-	private Map<Object,Object> deleteWatchers;
+	private List<GameRoom> gameRoomsAdd = new ArrayList<>(10000);
+	private List<String> gameRoomsDelete = new ArrayList<>(10000);
+	private Map<Object,Object> addWatchers = new HashMap<>(10000);
+	private Map<Object,Object> deleteWatchers = new HashMap<>(10000);
+	private Map<String,List<GameRoom>> gameRoomsAddPerUser = new HashMap<>(10000); 
 	
 	public GetLobbyUpdateViewAckEvent() {
 	
@@ -78,5 +80,13 @@ public class GetLobbyUpdateViewAckEvent extends BackgammonEvent{
 
 	public void setDeleteWatchers(Map<Object, Object> deleteWatchers) {
 		this.deleteWatchers = deleteWatchers;
+	}
+
+	public Map<String, List<GameRoom>> getGameRoomsAddPerUser() {
+		return gameRoomsAddPerUser;
+	}
+
+	public void setGameRoomsAddPerUser(Map<String, List<GameRoom>> gameRoomsAddPerUser) {
+		this.gameRoomsAddPerUser = gameRoomsAddPerUser;
 	}
 }

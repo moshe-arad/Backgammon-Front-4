@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,20 +85,11 @@ public class LobbyController {
 	
 	// #### To view Service ####
 	
-	@RequestMapping(value = "/room/all", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
-	public ResponseEntity<GameRoomsPayload> getAllGameRooms(){
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Type", "application/json");
-		
-		GameRoomsPayload gameRoomsPayload = lobbyService.getAllGameRooms();
-		return new ResponseEntity<GameRoomsPayload>(gameRoomsPayload, headers, HttpStatus.OK);
-	}
-	
 	@RequestMapping(value = "/update/view", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
-	public ResponseEntity<GetLobbyUpdateViewReply> getLobbyUpdateView(){
+	public ResponseEntity<GetLobbyUpdateViewReply> getLobbyUpdateView(@RequestParam(required = false) String username){
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json");
 		
-		return new ResponseEntity<GetLobbyUpdateViewReply>(lobbyService.getLobbyUpdateView(), headers, HttpStatus.OK);
+		return new ResponseEntity<GetLobbyUpdateViewReply>(lobbyService.getLobbyUpdateView(username), headers, HttpStatus.OK);
 	}
 }
