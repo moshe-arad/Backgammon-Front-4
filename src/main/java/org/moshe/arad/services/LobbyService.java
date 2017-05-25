@@ -89,7 +89,7 @@ public class LobbyService {
 		return isGameRoomDeleted;
 	}
 
-	public IsUserAddedAsWatcher addWatcherToGameRoom(String userNameFromJson, String gameRoomNameFromJson) {
+	public void addWatcherToGameRoom(String userNameFromJson, String gameRoomNameFromJson) {
 		logger.info("Preparing an add user as watcher command...");
 		
 		AddUserAsWatcherCommand addUserAsWatcherCommand = context.getBean(AddUserAsWatcherCommand.class);
@@ -97,25 +97,7 @@ public class LobbyService {
 		addUserAsWatcherCommand.setGameRoomName(gameRoomNameFromJson);
 		
 		addUserAsWatcherCommandProducer.setTopic(KafkaUtils.ADD_USER_AS_WATCHER_COMMAND_TOPIC);
-		UUID uuid = addUserAsWatcherCommandProducer.sendKafkaMessage(addUserAsWatcherCommand);
-		
-		eventsPool.getUserWatcherLockers().put(uuid.toString(), Thread.currentThread());
-		
-		synchronized (Thread.currentThread()) {
-			try {
-				Thread.currentThread().wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		UserAddedAsWatcherEventAck userAddedAsWatcherEventAck = (UserAddedAsWatcherEventAck) eventsPool.takeEventFromPoll(uuid);
-		IsUserAddedAsWatcher isUserAddedAsWatcher = context.getBean(IsUserAddedAsWatcher.class);
-		isUserAddedAsWatcher.setGameRoom(userAddedAsWatcherEventAck.getGameRoom());
-		if(userAddedAsWatcherEventAck.isUserAddedAsWatcher()) isUserAddedAsWatcher.setUserAddedAsWatcher(true);
-		else isUserAddedAsWatcher.setUserAddedAsWatcher(false);
-		
-		return isUserAddedAsWatcher;
+		addUserAsWatcherCommandProducer.sendKafkaMessage(addUserAsWatcherCommand);
 	}
 
 	public GetLobbyUpdateViewReply getLobbyUpdateView(String username) {

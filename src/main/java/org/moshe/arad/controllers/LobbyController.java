@@ -33,7 +33,7 @@ public class LobbyController {
 	private LobbyService lobbyService;
 	
 	@RequestMapping(value = "/room", consumes="application/json", method = RequestMethod.POST, produces = "application/json")
-	public ResponseEntity<IsGameRoomOpen> openNewGameRoom(@RequestBody String username){
+	public ResponseEntity<?> openNewGameRoom(@RequestBody String username){
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json");
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -67,7 +67,7 @@ public class LobbyController {
 	}
 	
 	@RequestMapping(value = "/room/watcher", consumes = "application/json", method = RequestMethod.PUT, produces="application/json")
-	public ResponseEntity<IsUserAddedAsWatcher> addWatcherToGameRoom(@RequestBody String body){
+	public ResponseEntity<?> addWatcherToGameRoom(@RequestBody String body){
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json");
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -79,8 +79,8 @@ public class LobbyController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		IsUserAddedAsWatcher isUserAddedAsWatcher = lobbyService.addWatcherToGameRoom(userNameFromJson, gameRoomNameFromJson);
-		return new ResponseEntity<IsUserAddedAsWatcher>(isUserAddedAsWatcher, headers, HttpStatus.OK);
+		lobbyService.addWatcherToGameRoom(userNameFromJson, gameRoomNameFromJson);
+		return new ResponseEntity<>(headers, HttpStatus.OK);
 	}
 	
 	// #### To view Service ####
