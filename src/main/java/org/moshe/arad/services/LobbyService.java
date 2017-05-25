@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
+import org.moshe.arad.kafka.commands.AddUserAsSecondPlayerCommand;
 import org.moshe.arad.kafka.commands.AddUserAsWatcherCommand;
 import org.moshe.arad.kafka.commands.CloseGameRoomCommand;
 import org.moshe.arad.kafka.commands.GetAllGameRoomsCommand;
@@ -41,6 +42,9 @@ public class LobbyService {
 	
 	@Autowired
 	private SimpleCommandsProducer<GetLobbyUpdateViewCommand> getLobbyUpdateViewCommandProducer;
+	
+	@Autowired
+	private SimpleCommandsProducer<AddUserAsSecondPlayerCommand> addUserAsSecondPlayerCommandProducer;
 	
 	@Autowired
 	private ApplicationContext context;
@@ -100,6 +104,17 @@ public class LobbyService {
 		addUserAsWatcherCommandProducer.sendKafkaMessage(addUserAsWatcherCommand);
 	}
 
+	public void addSecondPlayerToGameRoom(String userNameFromJson, String gameRoomNameFromJson) {
+		logger.info("Preparing an add user as second player command...");
+		
+		AddUserAsSecondPlayerCommand addUserAsSecondPlayerCommand = context.getBean(AddUserAsSecondPlayerCommand.class);
+		addUserAsSecondPlayerCommand.setUsername(userNameFromJson);
+		addUserAsSecondPlayerCommand.setGameRoomName(gameRoomNameFromJson);
+		
+		addUserAsSecondPlayerCommandProducer.setTopic(KafkaUtils.ADD_USER_AS_SECOND_PLAYER_COMMAND_TOPIC);
+		addUserAsSecondPlayerCommandProducer.sendKafkaMessage(addUserAsSecondPlayerCommand);
+	}
+	
 	public GetLobbyUpdateViewReply getLobbyUpdateView(String username) {
 		logger.info("Preparing a get Lobby Update view command...");
 		
@@ -123,5 +138,4 @@ public class LobbyService {
 		GetLobbyUpdateViewReply getLobbyUpdateViewReply = new GetLobbyUpdateViewReply(getLobbyUpdateViewAckEvent);
 		return getLobbyUpdateViewReply;
 	}
-
 }

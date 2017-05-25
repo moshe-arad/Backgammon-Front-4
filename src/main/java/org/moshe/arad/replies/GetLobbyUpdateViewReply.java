@@ -21,6 +21,7 @@ public class GetLobbyUpdateViewReply {
 	private List<String> gameRoomsDelete = new ArrayList<>(10000);
 	private List<DeleteWatcherFrom> deleteWatchers = new ArrayList<>(10000);
 	private List<AddWatcherTo> addWatchers = new ArrayList<>(10000);
+	private List<AddSecondTo> addSecondPlayer = new ArrayList<>(10000);
 	private Map<String,List<GameRoom>> gameRoomsAddPerUser = new HashMap<>(100000);
 	
 	public GetLobbyUpdateViewReply() {
@@ -51,6 +52,14 @@ public class GetLobbyUpdateViewReply {
 		while(it.hasNext()){
 			Map.Entry<Object,Object> entry = it.next();
 			this.deleteWatchers.add(new DeleteWatcherFrom(entry.getValue().toString(), entry.getKey().toString()));
+		}
+		
+		entries = getLobbyUpdateViewAckEvent.getAddSecondPlayer().entrySet();
+		it = entries.iterator();
+		
+		while(it.hasNext()){
+			Map.Entry<Object,Object> entry = it.next();
+			this.addSecondPlayer.add(new AddSecondTo(entry.getValue().toString(), entry.getKey().toString()));
 		}
 		
 		ListIterator<GameRoom> itList = getLobbyUpdateViewAckEvent.getGameRoomsAdd().listIterator();
@@ -115,5 +124,13 @@ public class GetLobbyUpdateViewReply {
 
 	public void setGameRoomsAddPerUser(Map<String, List<GameRoom>> gameRoomsAddPerUser) {
 		this.gameRoomsAddPerUser = gameRoomsAddPerUser;
+	}
+
+	public List<AddSecondTo> getAddSecondPlayer() {
+		return addSecondPlayer;
+	}
+
+	public void setAddSecondPlayer(List<AddSecondTo> addSecondPlayer) {
+		this.addSecondPlayer = addSecondPlayer;
 	}
 }
