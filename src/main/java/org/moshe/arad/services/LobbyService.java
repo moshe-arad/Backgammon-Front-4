@@ -47,6 +47,9 @@ public class LobbyService {
 	private SimpleCommandsProducer<AddUserAsSecondPlayerCommand> addUserAsSecondPlayerCommandProducer;
 	
 	@Autowired
+	private SimpleCommandsProducer<GetAllGameRoomsCommand> getAllGameRoomsCommandProducer;
+	
+	@Autowired
 	private ApplicationContext context;
 	
 	@Autowired
@@ -115,11 +118,43 @@ public class LobbyService {
 		addUserAsSecondPlayerCommandProducer.sendKafkaMessage(addUserAsSecondPlayerCommand);
 	}
 	
-	public GetLobbyUpdateViewReply getLobbyUpdateView(String username) {
+	public void getAllGameRooms(String username) {
+		logger.info("Preparing a get all game rooms command...");
+		 		
+		GetAllGameRoomsCommand getAllGameRoomsCommand = context.getBean(GetAllGameRoomsCommand.class);
+		getAllGameRoomsCommand.setUsername(username);		
+		getAllGameRoomsCommandProducer.setTopic(KafkaUtils.GET_ALL_GAME_ROOMS_COMMAND_TOPIC);
+		getAllGameRoomsCommandProducer.sendKafkaMessage(getAllGameRoomsCommand); 		 
+	}
+	
+	public GetLobbyUpdateViewReply getLobbyUpdateView(String all, String group, String user) {
 		logger.info("Preparing a get Lobby Update view command...");
 		
 		GetLobbyUpdateViewCommand getLobbyUpdateViewCommand = context.getBean(GetLobbyUpdateViewCommand.class);
-		getLobbyUpdateViewCommand.setUsername(username);
+		
+		if(all != null && !all.isEmpty() && !all.equals("none")){
+			getLobbyUpdateViewCommand.setAllLevel(true);
+			getLobbyUpdateViewCommand.setGroupLevel(false);
+			getLobbyUpdateViewCommand.setUserLevel(false);
+			getLobbyUpdateViewCommand.setGroup("");
+			getLobbyUpdateViewCommand.setUser("");
+		}
+		
+		if(group != null && !group.isEmpty() && !group.equals("none")){
+			getLobbyUpdateViewCommand.setAllLevel(false);
+			getLobbyUpdateViewCommand.setGroupLevel(true);
+			getLobbyUpdateViewCommand.setGroup(group);
+			getLobbyUpdateViewCommand.setUserLevel(false);
+			getLobbyUpdateViewCommand.setUser("");
+		}
+		
+		if(user != null && !user.isEmpty() && !user.equals("none")){
+			getLobbyUpdateViewCommand.setAllLevel(false);
+			getLobbyUpdateViewCommand.setGroupLevel(false);
+			getLobbyUpdateViewCommand.setGroup("");
+			getLobbyUpdateViewCommand.setUserLevel(true);
+			getLobbyUpdateViewCommand.setUser(user);
+		}
 		
 		getLobbyUpdateViewCommandProducer.setTopic(KafkaUtils.GET_LOBBY_UPDATE_VIEW_COMMAND_TOPIC);
 		UUID uuid = getLobbyUpdateViewCommandProducer.sendKafkaMessage(getLobbyUpdateViewCommand);
@@ -135,7 +170,7 @@ public class LobbyService {
 		}
 
 		GetLobbyUpdateViewAckEvent getLobbyUpdateViewAckEvent = (GetLobbyUpdateViewAckEvent) eventsPool.takeEventFromPoll(uuid);
-		GetLobbyUpdateViewReply getLobbyUpdateViewReply = new GetLobbyUpdateViewReply(getLobbyUpdateViewAckEvent);
+		GetLobbyUpdateViewReply getLobbyUpdateViewReply = new GetLobbyUpdateViewReply(getLobbyUpdateViewAckEvent.getLobbyViewChanges());
 		return getLobbyUpdateViewReply;
 	}
 }

@@ -9,6 +9,10 @@ public class GetAllGameRoomsCommand extends Command{
 
 	private String username;
 
+	public GetAllGameRoomsCommand() {
+	
+	}
+	
 	public GetAllGameRoomsCommand(String username) {
 		super();
 		this.username = username;

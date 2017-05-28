@@ -102,11 +102,20 @@ public class LobbyController {
 	
 	// #### To view Service ####
 	
+	@RequestMapping(value = "/room/all", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<?> getAllGameRooms(@RequestParam String username){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+	
+		lobbyService.getAllGameRooms(username);
+		return new ResponseEntity<>(headers, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/update/view", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
-	public ResponseEntity<GetLobbyUpdateViewReply> getLobbyUpdateView(@RequestParam(required = false) String username){
+	public ResponseEntity<GetLobbyUpdateViewReply> getLobbyUpdateView(@RequestParam String all, @RequestParam String group, @RequestParam String user){
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json");
 		
-		return new ResponseEntity<GetLobbyUpdateViewReply>(lobbyService.getLobbyUpdateView(username), headers, HttpStatus.OK);
+		return new ResponseEntity<GetLobbyUpdateViewReply>(lobbyService.getLobbyUpdateView(all, group, user), headers, HttpStatus.OK);
 	}
 }

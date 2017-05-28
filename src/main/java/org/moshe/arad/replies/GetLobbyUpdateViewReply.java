@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.moshe.arad.entities.GameRoom;
+import org.moshe.arad.entities.LobbyViewChanges;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,8 @@ public class GetLobbyUpdateViewReply {
 		this.addWatchers = addWatchers;
 	}
 	
-	public GetLobbyUpdateViewReply(GetLobbyUpdateViewAckEvent getLobbyUpdateViewAckEvent){
-		Set<Map.Entry<Object,Object>> entries = getLobbyUpdateViewAckEvent.getAddWatchers().entrySet();
+	public GetLobbyUpdateViewReply(LobbyViewChanges lobbyViewChanges){
+		Set<Map.Entry<Object,Object>> entries = lobbyViewChanges.getAddWatchers().entrySet();
 		Iterator<Map.Entry<Object,Object>> it = entries.iterator();
 		
 		while(it.hasNext()){
@@ -46,7 +47,7 @@ public class GetLobbyUpdateViewReply {
 			this.addWatchers.add(new AddWatcherTo(entry.getValue().toString(), entry.getKey().toString()));
 		}
 		
-		entries = getLobbyUpdateViewAckEvent.getDeleteWatchers().entrySet();
+		entries = lobbyViewChanges.getDeleteWatchers().entrySet();
 		it = entries.iterator();
 		
 		while(it.hasNext()){
@@ -54,7 +55,7 @@ public class GetLobbyUpdateViewReply {
 			this.deleteWatchers.add(new DeleteWatcherFrom(entry.getValue().toString(), entry.getKey().toString()));
 		}
 		
-		entries = getLobbyUpdateViewAckEvent.getAddSecondPlayer().entrySet();
+		entries = lobbyViewChanges.getAddSecondPlayer().entrySet();
 		it = entries.iterator();
 		
 		while(it.hasNext()){
@@ -62,21 +63,17 @@ public class GetLobbyUpdateViewReply {
 			this.addSecondPlayer.add(new AddSecondTo(entry.getValue().toString(), entry.getKey().toString()));
 		}
 		
-		ListIterator<GameRoom> itList = getLobbyUpdateViewAckEvent.getGameRoomsAdd().listIterator();
+		ListIterator<GameRoom> itList = lobbyViewChanges.getGameRoomsAdd().listIterator();
 		
 		while(itList.hasNext()){
 			GameRoom room = itList.next();
 			this.gameRoomsAdd.add(room);
 		}
 		
-		ListIterator<String> itListDeleteRooms = getLobbyUpdateViewAckEvent.getGameRoomsDelete().listIterator();
+		ListIterator<String> itListDeleteRooms = lobbyViewChanges.getGameRoomsDelete().listIterator();
 		
 		while(itListDeleteRooms.hasNext()){
 			this.gameRoomsDelete.add(itListDeleteRooms.next());
-		}
-		
-		if(getLobbyUpdateViewAckEvent.getGameRoomsAddPerUser() != null && !getLobbyUpdateViewAckEvent.getGameRoomsAddPerUser().isEmpty()){
-			this.setGameRoomsAddPerUser(getLobbyUpdateViewAckEvent.getGameRoomsAddPerUser());
 		}
 	}
 
