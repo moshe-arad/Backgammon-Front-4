@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 import org.moshe.arad.entities.BackgammonUser;
 import org.moshe.arad.entities.Status;
+import org.moshe.arad.kafka.events.GetUsersUpdateViewAckEvent;
+import org.moshe.arad.replies.GetLobbyUpdateViewReply;
 import org.moshe.arad.replies.IsUserFoundReply;
 import org.moshe.arad.requests.UserCredentials;
 import org.moshe.arad.services.HomeService;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,21 +80,14 @@ public class UsersController {
 		
 		try{
 			
-			boolean isCreated = homeService.createNewUser(backgammonUser);
+			homeService.createNewUser(backgammonUser);
 			
-			if(isCreated){
-				HttpHeaders header = new HttpHeaders();
-				header.add("Content-Type", "application/json");
-				ObjectMapper mapper = new ObjectMapper();
-				
-				BackgammonUser user = new BackgammonUser(backgammonUser.getUserName(), backgammonUser.getPassword(), backgammonUser.getFirstName(), backgammonUser.getLastName(), backgammonUser.getEmail(), Status.LoggedIn, Arrays.asList("user"));
-				return new ResponseEntity<String>(mapper.writeValueAsString(user), header, HttpStatus.CREATED);
-			}
-			else{
-				HttpHeaders header = new HttpHeaders();
-				header.add("Content-Type", "application/json");
-				return new ResponseEntity<String>(header, HttpStatus.OK);
-			}
+			HttpHeaders header = new HttpHeaders();
+			header.add("Content-Type", "application/json");
+			ObjectMapper mapper = new ObjectMapper();
+			
+			BackgammonUser user = new BackgammonUser(backgammonUser.getUserName(), backgammonUser.getPassword(), backgammonUser.getFirstName(), backgammonUser.getLastName(), backgammonUser.getEmail(), Status.LoggedIn, Arrays.asList("user"));
+			return new ResponseEntity<String>(mapper.writeValueAsString(user), header, HttpStatus.CREATED);
 		}
 		catch(Exception ex){
 			logger.info("User register failed.");
@@ -140,5 +136,24 @@ public class UsersController {
 			logger.error(ex.toString());
 			return new EmailAvailabilityMessage(false);
 		}
+	}
+	
+	@RequestMapping(value = "/users/update/view", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<GetUsersUpdateViewAckEvent> getLobbyUpdateView(@RequestParam String all, @RequestParam String group, @RequestParam String user){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		
+		long startTime = System.nanoTime();
+		GetUsersUpdateViewAckEvent result = homeService.getUsersUpdateView(all, group, user);
+		long endTime = System.nanoTime();
+
+		long duration = (endTime - startTime);
+		
+		logger.info("**********************************");
+		logger.info("**********************************");
+		logger.info("***** duration = " + duration + "*************");
+		logger.info("**********************************");
+		logger.info("**********************************");
+		return new ResponseEntity<GetUsersUpdateViewAckEvent>(result, headers, HttpStatus.OK);
 	}
 }

@@ -31,7 +31,8 @@ public class EventsPool {
 	private Map<String, Thread> closeGameRoomLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> userWatcherLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> getRoomsLockers = new HashMap<>(POOL_SIZE);
-	private Map<String, Thread> getUpdateViewLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> getLobbyUpdateViewLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> getUsersUpdateViewLockers = new HashMap<>(POOL_SIZE);
 	
 	public boolean addEventToPool(BackgammonEvent event){
 		return events.add(event);
@@ -143,10 +144,18 @@ public class EventsPool {
 	}
 
 	public Map<String, Thread> getGetUpdateViewLockers() {
-		return getUpdateViewLockers;
+		return getLobbyUpdateViewLockers;
 	}
 
 	public void setGetUpdateViewLockers(Map<String, Thread> getUpdateViewLockers) {
-		this.getUpdateViewLockers = getUpdateViewLockers;
+		this.getLobbyUpdateViewLockers = getUpdateViewLockers;
+	}
+
+	public Map<String, Thread> getGetUsersUpdateViewLockers() {
+		return getUsersUpdateViewLockers;
+	}
+
+	public void setGetUsersUpdateViewLockers(Map<String, Thread> getUsersUpdateViewLockers) {
+		this.getUsersUpdateViewLockers = getUsersUpdateViewLockers;
 	}
 }

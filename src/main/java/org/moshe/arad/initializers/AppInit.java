@@ -12,6 +12,7 @@ import org.moshe.arad.kafka.consumers.ISimpleConsumer;
 import org.moshe.arad.kafka.consumers.config.CloseGameRoomEventAckConfig;
 import org.moshe.arad.kafka.consumers.config.GetAllGameRoomsEventAckConfig;
 import org.moshe.arad.kafka.consumers.config.GetLobbyUpdateViewAckEventConfig;
+import org.moshe.arad.kafka.consumers.config.GetUsersUpdateViewAckEventConfig;
 import org.moshe.arad.kafka.consumers.config.LogInUserAckEventConfig;
 import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventAckConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
@@ -19,6 +20,7 @@ import org.moshe.arad.kafka.consumers.config.UserAddedAsWatcherEventAckConfig;
 import org.moshe.arad.kafka.consumers.events.CloseGameRoomEventAckConsumer;
 import org.moshe.arad.kafka.consumers.events.GetAllGameRoomsEventAckConsumer;
 import org.moshe.arad.kafka.consumers.events.GetLobbyUpdateViewAckEventConsumer;
+import org.moshe.arad.kafka.consumers.events.GetUsersUpdateViewAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.LogInUserAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.NewGameRoomOpenedEventAckConsumer;
 import org.moshe.arad.kafka.consumers.events.NewUserCreatedAckEventConsumer;
@@ -45,11 +47,6 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	
 	@Resource(name = "UserEmailAvailabilityCheckedEventConfig")
 	private SimpleConsumerConfig userEamilAvailabilityCheckedEventConfig;
-	
-	private NewUserCreatedAckEventConsumer newUserCreatedAckEventConsumer;
-	
-	@Resource(name = "NewUserCreatedAckEventConfig")
-	private SimpleConsumerConfig newUserCreatedAckEventConfig;
 	
 	private LogInUserAckEventConsumer logInUserAckEventConsumer;
 	
@@ -81,6 +78,11 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	@Autowired
 	private GetLobbyUpdateViewAckEventConfig getLobbyUpdateViewAckEventConfig;
 	
+	private GetUsersUpdateViewAckEventConsumer getUsersUpdateViewAckEventConsumer;
+	
+	@Autowired
+	private GetUsersUpdateViewAckEventConfig getUsersUpdateViewAckEventConfig;
+	
 	private ExecutorService executor = Executors.newFixedThreadPool(6);
 	
 	private Logger logger = LoggerFactory.getLogger(AppInit.class);
@@ -103,13 +105,13 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 		for(int i=0; i<NUM_CONSUMERS; i++){
 			userNameAvailabilityCheckedEventConsumer = context.getBean(UserNameAckEventConsumer.class);
 			userEmailAvailabilityCheckedEventConsumer = context.getBean(UserEmailAckEventConsumer.class);
-			newUserCreatedAckEventConsumer = context.getBean(NewUserCreatedAckEventConsumer.class);
 			logInUserAckEventConsumer = context.getBean(LogInUserAckEventConsumer.class);
 			newGameRoomOpenedEventAckConsumer = context.getBean(NewGameRoomOpenedEventAckConsumer.class);
 			closeGameRoomEventAckConsumer = context.getBean(CloseGameRoomEventAckConsumer.class);
 			userAddedAsWatcherEventAckConsumer = context.getBean(UserAddedAsWatcherEventAckConsumer.class);
 			getAllGameRoomsEventAckConsumer = context.getBean(GetAllGameRoomsEventAckConsumer.class);
 			getLobbyUpdateViewAckEventConsumer = context.getBean(GetLobbyUpdateViewAckEventConsumer.class);
+			getUsersUpdateViewAckEventConsumer = context.getBean(GetUsersUpdateViewAckEventConsumer.class);
 			
 			logger.info("Initializing user name availability checked event consumer...");		
 			initSingleConsumer(userNameAvailabilityCheckedEventConsumer, KafkaUtils.USER_NAME_AVAILABILITY_CHECKED_EVENT_TOPIC, userNameAvailabilityCheckedEventConfig);		
@@ -118,10 +120,6 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			logger.info("Initializing user email avialability checked event consumer...");		
 			initSingleConsumer(userEmailAvailabilityCheckedEventConsumer, KafkaUtils.EMAIL_AVAILABILITY_CHECKED_EVENT_TOPIC, userEamilAvailabilityCheckedEventConfig);				
 			logger.info("Initialize user email avialability checked event consumer, completed...");
-	
-			logger.info("Initializing new user created ack event consumer...");		
-			initSingleConsumer(newUserCreatedAckEventConsumer, KafkaUtils.NEW_USER_CREATED_ACK_EVENT_TOPIC, newUserCreatedAckEventConfig);		
-			logger.info("Initialize new user created ack event consumer, completed...");
 			
 			initSingleConsumer(logInUserAckEventConsumer, KafkaUtils.LOG_IN_USER_ACK_EVENT_TOPIC, logInUserAckEventConfig);
 						
@@ -135,15 +133,17 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			
 			initSingleConsumer(getLobbyUpdateViewAckEventConsumer, KafkaUtils.GET_LOBBY_UPDATE_VIEW_ACK_EVENT_TOPIC, getLobbyUpdateViewAckEventConfig);
 			
+			initSingleConsumer(getUsersUpdateViewAckEventConsumer, KafkaUtils.GET_USERS_UPDATE_VIEW_ACK_EVENT_TOPIC, getUsersUpdateViewAckEventConfig);
+			
 			executeProducersAndConsumers(Arrays.asList(userEmailAvailabilityCheckedEventConsumer,
 					userNameAvailabilityCheckedEventConsumer, 
-					newUserCreatedAckEventConsumer,
 					logInUserAckEventConsumer,
 					newGameRoomOpenedEventAckConsumer,
 					closeGameRoomEventAckConsumer,
 					userAddedAsWatcherEventAckConsumer,
 					getAllGameRoomsEventAckConsumer,
-					getLobbyUpdateViewAckEventConsumer));
+					getLobbyUpdateViewAckEventConsumer,
+					getUsersUpdateViewAckEventConsumer));
 		}
 	}	
 

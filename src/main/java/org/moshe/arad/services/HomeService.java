@@ -10,8 +10,12 @@ import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.CheckUserEmailCommand;
 import org.moshe.arad.kafka.commands.CheckUserNameCommand;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
+import org.moshe.arad.kafka.commands.GetLobbyUpdateViewCommand;
+import org.moshe.arad.kafka.commands.GetUsersUpdateViewCommand;
 import org.moshe.arad.kafka.commands.LogInUserCommand;
 import org.moshe.arad.kafka.commands.LogOutUserCommand;
+import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
+import org.moshe.arad.kafka.events.GetUsersUpdateViewAckEvent;
 import org.moshe.arad.kafka.events.LogInUserAckEvent;
 import org.moshe.arad.kafka.events.LogOutUserAckEvent;
 import org.moshe.arad.kafka.events.LoggedInEvent;
@@ -21,6 +25,7 @@ import org.moshe.arad.kafka.events.UserEmailAckEvent;
 import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
 import org.moshe.arad.kafka.producers.events.SimpleEventsProducer;
+import org.moshe.arad.replies.GetLobbyUpdateViewReply;
 import org.moshe.arad.replies.IsUserFoundReply;
 import org.moshe.arad.requests.UserCredentials;
 import org.slf4j.Logger;
@@ -47,7 +52,7 @@ public class HomeService implements ApplicationContextAware {
 	private SimpleCommandsProducer<LogOutUserCommand> logOutUserCommandProducer;
 	
 	@Autowired
-	private SimpleEventsProducer<LoggedOutEvent> loggedOutEventProducer;
+	private SimpleCommandsProducer<GetUsersUpdateViewCommand> getUsersUpdateViewCommandProducer;
 	
 	@Autowired
 	private EventsPool eventsPool;	
@@ -148,30 +153,13 @@ public class HomeService implements ApplicationContextAware {
 		return userEmailAvailabilityCheckedEvent.isAvailable();
 	}
 
-	public boolean createNewUser(BackgammonUser backgammonUser){
-		UUID uuid;
-		
+	public void createNewUser(BackgammonUser backgammonUser){
 		simpleCreateNewUserCommandProducer.setTopic(KafkaUtils.CREATE_NEW_USER_COMMAND_TOPIC);
 		CreateNewUserCommand createNewUserCommand = getCreateNewUserCommand(backgammonUser);	
 			
 		if(!isEmailAvailable(backgammonUser.getEmail()) || !isUserNameAvailable(backgammonUser.getUserName())) throw new RuntimeException("Email or user name is already taken.");
 		logger.info("User's email and user name are available.");
-		uuid = simpleCreateNewUserCommandProducer.sendKafkaMessage(createNewUserCommand);
-		eventsPool.getCreateUserLockers().put(uuid.toString(), Thread.currentThread());
-		
-		synchronized (Thread.currentThread()) {
-			try {
-				Thread.currentThread().wait();
-			} catch (InterruptedException e) {				
-				e.printStackTrace();
-				return false;
-			}
-		}
-		
-		NewUserCreatedAckEvent newUserCreatedAckEvent = (NewUserCreatedAckEvent) eventsPool.takeEventFromPoll(uuid);
-		
-		if(newUserCreatedAckEvent.isUserCreated()) return true;
-		else return false;
+		simpleCreateNewUserCommandProducer.sendKafkaMessage(createNewUserCommand);
 	}
 
 	private CreateNewUserCommand getCreateNewUserCommand(BackgammonUser backgammonUser) {
@@ -203,6 +191,52 @@ public class HomeService implements ApplicationContextAware {
 
 	public void setEventsPoll(EventsPool eventsPoll) {
 		this.eventsPool = eventsPoll;
+	}
+
+	public GetUsersUpdateViewAckEvent getUsersUpdateView(String all, String group, String user) {
+		logger.info("Preparing a get Users Update view command...");
+		
+		GetUsersUpdateViewCommand getUsersUpdateViewCommand = context.getBean(GetUsersUpdateViewCommand.class);
+		
+		if(all != null && !all.isEmpty() && !all.equals("none")){
+			getUsersUpdateViewCommand.setAllLevel(true);
+			getUsersUpdateViewCommand.setGroupLevel(false);
+			getUsersUpdateViewCommand.setUserLevel(false);
+			getUsersUpdateViewCommand.setGroup("");
+			getUsersUpdateViewCommand.setUser("");
+		}
+		
+		if(group != null && !group.isEmpty() && !group.equals("none")){
+			getUsersUpdateViewCommand.setAllLevel(false);
+			getUsersUpdateViewCommand.setGroupLevel(true);
+			getUsersUpdateViewCommand.setGroup(group);
+			getUsersUpdateViewCommand.setUserLevel(false);
+			getUsersUpdateViewCommand.setUser("");
+		}
+		
+		if(user != null && !user.isEmpty() && !user.equals("none")){
+			getUsersUpdateViewCommand.setAllLevel(false);
+			getUsersUpdateViewCommand.setGroupLevel(false);
+			getUsersUpdateViewCommand.setGroup("");
+			getUsersUpdateViewCommand.setUserLevel(true);
+			getUsersUpdateViewCommand.setUser(user);
+		}
+		
+		getUsersUpdateViewCommandProducer.setTopic(KafkaUtils.GET_USERS_UPDATE_VIEW_COMMAND_TOPIC);
+		UUID uuid = getUsersUpdateViewCommandProducer.sendKafkaMessage(getUsersUpdateViewCommand);
+		
+		eventsPool.getGetUsersUpdateViewLockers().put(uuid.toString(), Thread.currentThread());
+		
+		synchronized (Thread.currentThread()) {
+			try {
+				Thread.currentThread().wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		GetUsersUpdateViewAckEvent getUsersUpdateViewAckEvent = (GetUsersUpdateViewAckEvent) eventsPool.takeEventFromPoll(uuid);
+		return getUsersUpdateViewAckEvent;
 	}	
 }
 
