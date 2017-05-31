@@ -26,7 +26,7 @@ public class EventsPool {
 	private Map<String, Thread> userNamesLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> emailsLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> createUserLockers = new HashMap<>(POOL_SIZE);
-	private Map<String, Thread> userLogInLockers = new HashMap<>(POOL_SIZE);
+//	private Map<String, Thread> userLogInLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> openNewGameRoomLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> closeGameRoomLockers = new HashMap<>(POOL_SIZE);
 	private Map<String, Thread> userWatcherLockers = new HashMap<>(POOL_SIZE);
@@ -103,13 +103,13 @@ public class EventsPool {
 		this.createUserLockers = createUserLockers;
 	}
 
-	public Map<String, Thread> getUserLogInLockers() {
-		return userLogInLockers;
-	}
-
-	public void setUserLogInLockers(Map<String, Thread> userLogInLockers) {
-		this.userLogInLockers = userLogInLockers;
-	}
+//	public Map<String, Thread> getUserLogInLockers() {
+//		return userLogInLockers;
+//	}
+//
+//	public void setUserLogInLockers(Map<String, Thread> userLogInLockers) {
+//		this.userLogInLockers = userLogInLockers;
+//	}
 
 	public Map<String, Thread> getOpenNewGameRoomLockers() {
 		return openNewGameRoomLockers;

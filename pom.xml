@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.moshe.arad</groupId>
-	<artifactId>backgammon-front-4.0</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>backgammon-front</artifactId>
+	<version>4.0</version>
 	<packaging>jar</packaging>
 
 	<name>backgammon-front-4.0</name>

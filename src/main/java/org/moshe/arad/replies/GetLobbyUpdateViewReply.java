@@ -23,7 +23,6 @@ public class GetLobbyUpdateViewReply {
 	private List<DeleteWatcherFrom> deleteWatchers = new ArrayList<>(10000);
 	private List<AddWatcherTo> addWatchers = new ArrayList<>(10000);
 	private List<AddSecondTo> addSecondPlayer = new ArrayList<>(10000);
-	private Map<String,List<GameRoom>> gameRoomsAddPerUser = new HashMap<>(100000);
 	
 	public GetLobbyUpdateViewReply() {
 	
@@ -113,14 +112,6 @@ public class GetLobbyUpdateViewReply {
 
 	public void setAddWatchers(List<AddWatcherTo> addWatchers) {
 		this.addWatchers = addWatchers;
-	}
-
-	public Map<String, List<GameRoom>> getGameRoomsAddPerUser() {
-		return gameRoomsAddPerUser;
-	}
-
-	public void setGameRoomsAddPerUser(Map<String, List<GameRoom>> gameRoomsAddPerUser) {
-		this.gameRoomsAddPerUser = gameRoomsAddPerUser;
 	}
 
 	public List<AddSecondTo> getAddSecondPlayer() {

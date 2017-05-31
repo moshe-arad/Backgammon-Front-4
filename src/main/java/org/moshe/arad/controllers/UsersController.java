@@ -37,7 +37,7 @@ public class UsersController {
 	private HomeService homeService;
 	
 	@RequestMapping(value = "/users/login", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
-	public ResponseEntity<IsUserFoundReply> findExistingUserAndLogin(@RequestBody String body){
+	public ResponseEntity<?> findExistingUserAndLogin(@RequestBody String body){
 		HttpHeaders header = new HttpHeaders();
 		header.add("Content-Type", "application/json");
 		
@@ -50,8 +50,8 @@ public class UsersController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		return new ResponseEntity<IsUserFoundReply>(homeService.findExistingUserAndLogin(new UserCredentials(userNameFromJson, passwordFromJson)), header, HttpStatus.OK);
+		homeService.findExistingUserAndLogin(new UserCredentials(userNameFromJson, passwordFromJson));
+		return new ResponseEntity<>(header, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/users/logout", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
@@ -143,17 +143,8 @@ public class UsersController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json");
 		
-		long startTime = System.nanoTime();
 		GetUsersUpdateViewAckEvent result = homeService.getUsersUpdateView(all, group, user);
-		long endTime = System.nanoTime();
-
-		long duration = (endTime - startTime);
 		
-		logger.info("**********************************");
-		logger.info("**********************************");
-		logger.info("***** duration = " + duration + "*************");
-		logger.info("**********************************");
-		logger.info("**********************************");
 		return new ResponseEntity<GetUsersUpdateViewAckEvent>(result, headers, HttpStatus.OK);
 	}
 }

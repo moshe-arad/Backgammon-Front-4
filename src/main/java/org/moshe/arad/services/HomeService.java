@@ -62,7 +62,7 @@ public class HomeService implements ApplicationContextAware {
 	private Logger logger = LoggerFactory.getLogger(HomeService.class);
 	
 	
-	public IsUserFoundReply findExistingUserAndLogin(UserCredentials userCredentials){
+	public void findExistingUserAndLogin(UserCredentials userCredentials){
 		IsUserFoundReply result = new IsUserFoundReply();
 		
 		//will update view as user loggedIn
@@ -72,31 +72,31 @@ public class HomeService implements ApplicationContextAware {
 		
 		logInUserCommand.setUser(new BackgammonUser(userCredentials.getUsername(), userCredentials.getPassword()));
 		
-		UUID uuid = logInUserCommandProducer.sendKafkaMessage(logInUserCommand);
-		eventsPool.getUserLogInLockers().put(uuid.toString(), Thread.currentThread());
-		
-		synchronized (Thread.currentThread()) {
-			
-			try {
-				Thread.currentThread().wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Failed to find user and log him in...");
-			}
-		}
-		
-		LogInUserAckEvent logInUserAckEvent = (LogInUserAckEvent) eventsPool.takeEventFromPoll(uuid);
-		
-		if(!logInUserAckEvent.isUserFound()){
-			result.setIsUserFound(false);
-			return result;
-		}
-		else{
-			result.setIsUserFound(true);
-			result.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
-			result.getBackgammonUser().setUser_permissions(Arrays.asList("user"));
-			return result;
-		}
+		logInUserCommandProducer.sendKafkaMessage(logInUserCommand);
+//		eventsPool.getUserLogInLockers().put(uuid.toString(), Thread.currentThread());
+//		
+//		synchronized (Thread.currentThread()) {
+//			
+//			try {
+//				Thread.currentThread().wait();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//				throw new RuntimeException("Failed to find user and log him in...");
+//			}
+//		}
+//		
+//		LogInUserAckEvent logInUserAckEvent = (LogInUserAckEvent) eventsPool.takeEventFromPoll(uuid);
+//		
+//		if(!logInUserAckEvent.isUserFound()){
+//			result.setIsUserFound(false);
+//			return result;
+//		}
+//		else{
+//			result.setIsUserFound(true);
+//			result.setBackgammonUser(logInUserAckEvent.getBackgammonUser());
+//			result.getBackgammonUser().setUser_permissions(Arrays.asList("user"));
+//			return result;
+//		}
 	}
 	
 	public void findExistingUserAndLogout(UserCredentials userCredentials) {
