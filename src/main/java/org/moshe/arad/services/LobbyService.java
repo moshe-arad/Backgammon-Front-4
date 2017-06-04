@@ -6,22 +6,12 @@ import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.AddUserAsSecondPlayerCommand;
 import org.moshe.arad.kafka.commands.AddUserAsWatcherCommand;
-import org.moshe.arad.kafka.commands.CloseGameRoomCommand;
 import org.moshe.arad.kafka.commands.GetAllGameRoomsCommand;
 import org.moshe.arad.kafka.commands.GetLobbyUpdateViewCommand;
 import org.moshe.arad.kafka.commands.OpenNewGameRoomCommand;
-import org.moshe.arad.kafka.events.CloseGameRoomEventAck;
-import org.moshe.arad.kafka.events.GetAllGameRoomsAckEvent;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
-import org.moshe.arad.kafka.events.UserAddedAsWatcherEventAck;
-import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
-import org.moshe.arad.replies.GameRoomsPayload;
 import org.moshe.arad.replies.GetLobbyUpdateViewReply;
-import org.moshe.arad.replies.IsGameRoomDeleted;
-import org.moshe.arad.replies.IsGameRoomOpen;
-import org.moshe.arad.replies.IsUserAddedAsWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +23,6 @@ public class LobbyService {
 
 	@Autowired
 	private SimpleCommandsProducer<OpenNewGameRoomCommand> openNewGameRoomCommandProducer;
-	
-	@Autowired
-	private SimpleCommandsProducer<CloseGameRoomCommand> closeGameRoomCommandProducer;
 	
 	@Autowired
 	private SimpleCommandsProducer<AddUserAsWatcherCommand> addUserAsWatcherCommandProducer;
@@ -65,35 +52,6 @@ public class LobbyService {
 		
 		openNewGameRoomCommandProducer.setTopic(KafkaUtils.OPEN_NEW_GAME_ROOM_COMMAND_TOPIC);
 		openNewGameRoomCommandProducer.sendKafkaMessage(openNewGameRoomCommand);
-	}
-
-	@Deprecated
-	public IsGameRoomDeleted closeGameRoomOpenedBy(String userNameFromJson) {
-		logger.info("Preparing a close game room command...");
-		
-		CloseGameRoomCommand closeGameRoomCommand = context.getBean(CloseGameRoomCommand.class);
-		closeGameRoomCommand.setOpenedBy(userNameFromJson);
-		
-		closeGameRoomCommandProducer.setTopic(KafkaUtils.CLOSE_GAME_ROOM_COMMAND_TOPIC);
-		UUID uuid = closeGameRoomCommandProducer.sendKafkaMessage(closeGameRoomCommand);
-		
-		eventsPool.getCloseGameRoomLockers().put(uuid.toString(), Thread.currentThread());
-		
-		synchronized (Thread.currentThread()) {
-			try {
-				Thread.currentThread().wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		CloseGameRoomEventAck closeGameRoomEventAck = (CloseGameRoomEventAck) eventsPool.takeEventFromPoll(uuid);
-		IsGameRoomDeleted isGameRoomDeleted = context.getBean(IsGameRoomDeleted.class);
-		isGameRoomDeleted.setGameRoom(closeGameRoomEventAck.getGameRoom());
-		if(closeGameRoomEventAck.isGameRoomClosed()) isGameRoomDeleted.setGameRoomDeleted(true);
-		else isGameRoomDeleted.setGameRoomDeleted(false);
-		
-		return isGameRoomDeleted;
 	}
 
 	public void addWatcherToGameRoom(String userNameFromJson, String gameRoomNameFromJson) {

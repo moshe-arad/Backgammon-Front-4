@@ -2,12 +2,7 @@ package org.moshe.arad.controllers;
 
 import java.io.IOException;
 
-import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
-import org.moshe.arad.replies.GameRoomsPayload;
 import org.moshe.arad.replies.GetLobbyUpdateViewReply;
-import org.moshe.arad.replies.IsGameRoomDeleted;
-import org.moshe.arad.replies.IsGameRoomOpen;
-import org.moshe.arad.replies.IsUserAddedAsWatcher;
 import org.moshe.arad.services.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -47,23 +42,6 @@ public class LobbyController {
 		lobbyService.openNewGameRoom(userNameFromJson);
 		return new ResponseEntity<>(header, HttpStatus.CREATED);
 		
-	}
-	
-	//to use it on game page when want to exit, but redirect to lobby, instead of logout.
-	//TODO refactor this - do not use ack
-	@RequestMapping(value = "/room/close", consumes="application/json", method = RequestMethod.DELETE, produces = "application/json")
-	public ResponseEntity<IsGameRoomDeleted> closeGameRoom(@RequestBody String username){
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Type", "application/json");
-		ObjectMapper objectMapper = new ObjectMapper();
-		String userNameFromJson = null;
-		try {
-			userNameFromJson = objectMapper.readTree(username).path("username").asText();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		IsGameRoomDeleted isGameRoomDeleted = lobbyService.closeGameRoomOpenedBy(userNameFromJson);
-		return new ResponseEntity<IsGameRoomDeleted>(isGameRoomDeleted, headers, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/room/watcher", consumes = "application/json", method = RequestMethod.PUT, produces="application/json")

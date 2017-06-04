@@ -9,14 +9,12 @@ import javax.annotation.Resource;
 
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
-import org.moshe.arad.kafka.consumers.config.CloseGameRoomEventAckConfig;
 import org.moshe.arad.kafka.consumers.config.GetAllGameRoomsEventAckConfig;
 import org.moshe.arad.kafka.consumers.config.GetLobbyUpdateViewAckEventConfig;
 import org.moshe.arad.kafka.consumers.config.GetUsersUpdateViewAckEventConfig;
 import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventAckConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.consumers.config.UserAddedAsWatcherEventAckConfig;
-import org.moshe.arad.kafka.consumers.events.CloseGameRoomEventAckConsumer;
 import org.moshe.arad.kafka.consumers.events.GetAllGameRoomsEventAckConsumer;
 import org.moshe.arad.kafka.consumers.events.GetLobbyUpdateViewAckEventConsumer;
 import org.moshe.arad.kafka.consumers.events.GetUsersUpdateViewAckEventConsumer;
@@ -49,11 +47,6 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 	
 	@Autowired
 	private NewGameRoomOpenedEventAckConfig newGameRoomOpenedEventAckConfig;
-	
-	private CloseGameRoomEventAckConsumer closeGameRoomEventAckConsumer;
-	
-	@Autowired
-	private CloseGameRoomEventAckConfig closeGameRoomEventAckConfig;
 	
 	private UserAddedAsWatcherEventAckConsumer userAddedAsWatcherEventAckConsumer;
 	
@@ -98,7 +91,6 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			userNameAvailabilityCheckedEventConsumer = context.getBean(UserNameAckEventConsumer.class);
 			userEmailAvailabilityCheckedEventConsumer = context.getBean(UserEmailAckEventConsumer.class);
 			newGameRoomOpenedEventAckConsumer = context.getBean(NewGameRoomOpenedEventAckConsumer.class);
-			closeGameRoomEventAckConsumer = context.getBean(CloseGameRoomEventAckConsumer.class);
 			userAddedAsWatcherEventAckConsumer = context.getBean(UserAddedAsWatcherEventAckConsumer.class);
 			getAllGameRoomsEventAckConsumer = context.getBean(GetAllGameRoomsEventAckConsumer.class);
 			getLobbyUpdateViewAckEventConsumer = context.getBean(GetLobbyUpdateViewAckEventConsumer.class);
@@ -114,8 +106,6 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 						
 			initSingleConsumer(newGameRoomOpenedEventAckConsumer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_ACK_TOPIC, newGameRoomOpenedEventAckConfig);
 			
-			initSingleConsumer(closeGameRoomEventAckConsumer, KafkaUtils.CLOSE_GAME_ROOM_EVENT_ACK_TOPIC, closeGameRoomEventAckConfig);
-			
 			initSingleConsumer(userAddedAsWatcherEventAckConsumer, KafkaUtils.USER_ADDED_AS_WATCHER_EVENT_ACK_TOPIC, userAddedAsWatcherEventAckConfig);
 						
 			initSingleConsumer(getAllGameRoomsEventAckConsumer, KafkaUtils.GET_ALL_GAME_ROOMS_EVENT_ACK_TOPIC, getAllGameRoomsEventAckConfig);
@@ -127,7 +117,6 @@ public class AppInit implements IAppInitializer, ApplicationContextAware	 {
 			executeProducersAndConsumers(Arrays.asList(userEmailAvailabilityCheckedEventConsumer,
 					userNameAvailabilityCheckedEventConsumer, 
 					newGameRoomOpenedEventAckConsumer,
-					closeGameRoomEventAckConsumer,
 					userAddedAsWatcherEventAckConsumer,
 					getAllGameRoomsEventAckConsumer,
 					getLobbyUpdateViewAckEventConsumer,
