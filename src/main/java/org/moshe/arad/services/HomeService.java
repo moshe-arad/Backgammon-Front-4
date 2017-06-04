@@ -1,7 +1,5 @@
 package org.moshe.arad.services;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.UUID;
 
 import org.moshe.arad.entities.BackgammonUser;
@@ -10,22 +8,12 @@ import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.CheckUserEmailCommand;
 import org.moshe.arad.kafka.commands.CheckUserNameCommand;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
-import org.moshe.arad.kafka.commands.GetLobbyUpdateViewCommand;
 import org.moshe.arad.kafka.commands.GetUsersUpdateViewCommand;
 import org.moshe.arad.kafka.commands.LogInUserCommand;
-import org.moshe.arad.kafka.commands.LogOutUserCommand;
-import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
 import org.moshe.arad.kafka.events.GetUsersUpdateViewAckEvent;
-import org.moshe.arad.kafka.events.LogInUserAckEvent;
-import org.moshe.arad.kafka.events.LogOutUserAckEvent;
-import org.moshe.arad.kafka.events.LoggedInEvent;
-import org.moshe.arad.kafka.events.LoggedOutEvent;
-import org.moshe.arad.kafka.events.NewUserCreatedAckEvent;
 import org.moshe.arad.kafka.events.UserEmailAckEvent;
 import org.moshe.arad.kafka.events.UserNameAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
-import org.moshe.arad.kafka.producers.events.SimpleEventsProducer;
-import org.moshe.arad.replies.GetLobbyUpdateViewReply;
 import org.moshe.arad.replies.IsUserFoundReply;
 import org.moshe.arad.requests.UserCredentials;
 import org.slf4j.Logger;
@@ -47,9 +35,6 @@ public class HomeService implements ApplicationContextAware {
 	
 	@Autowired
 	private SimpleCommandsProducer<CheckUserEmailCommand> simpleCheckUserEmailAvailabilityCommandProducer;
-	
-	@Autowired
-	private SimpleCommandsProducer<LogOutUserCommand> logOutUserCommandProducer;
 	
 	@Autowired
 	private SimpleCommandsProducer<GetUsersUpdateViewCommand> getUsersUpdateViewCommandProducer;
@@ -77,11 +62,6 @@ public class HomeService implements ApplicationContextAware {
 	
 	public void findExistingUserAndLogout(UserCredentials userCredentials) {
 		BackgammonUser backgammonUser = new BackgammonUser(userCredentials.getUsername(), userCredentials.getPassword(), "", "", "", null);		
-		LogOutUserCommand logOutUserCommand = context.getBean(LogOutUserCommand.class);		
-		logOutUserCommand.setBackgammonUser(backgammonUser);
-		
-		logOutUserCommandProducer.setTopic(KafkaUtils.LOG_OUT_USER_COMMAND_TOPIC);
-		logOutUserCommandProducer.sendKafkaMessage(logOutUserCommand);
 	}
 	
 	public boolean isUserNameAvailable(String userName){
