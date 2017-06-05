@@ -2,6 +2,7 @@ package org.moshe.arad.services;
 
 import java.util.UUID;
 
+import org.moshe.arad.entities.LobbyViewChanges;
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.AddUserAsSecondPlayerCommand;
@@ -128,7 +129,9 @@ public class LobbyService {
 		}
 
 		GetLobbyUpdateViewAckEvent getLobbyUpdateViewAckEvent = (GetLobbyUpdateViewAckEvent) eventsPool.takeEventFromPoll(uuid);
-		GetLobbyUpdateViewReply getLobbyUpdateViewReply = new GetLobbyUpdateViewReply(getLobbyUpdateViewAckEvent.getLobbyViewChanges());
+		LobbyViewChanges lobbyViewChanges = getLobbyUpdateViewAckEvent.getLobbyViewChanges();
+		if(lobbyViewChanges == null) lobbyViewChanges = context.getBean(LobbyViewChanges.class);
+		GetLobbyUpdateViewReply getLobbyUpdateViewReply = new GetLobbyUpdateViewReply(lobbyViewChanges);
 		return getLobbyUpdateViewReply;
 	}
 }

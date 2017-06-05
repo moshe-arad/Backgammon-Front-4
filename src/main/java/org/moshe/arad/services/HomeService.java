@@ -3,6 +3,7 @@ package org.moshe.arad.services;
 import java.util.UUID;
 
 import org.moshe.arad.entities.BackgammonUser;
+import org.moshe.arad.entities.UsersViewChanges;
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.CheckUserEmailCommand;
@@ -10,6 +11,7 @@ import org.moshe.arad.kafka.commands.CheckUserNameCommand;
 import org.moshe.arad.kafka.commands.CreateNewUserCommand;
 import org.moshe.arad.kafka.commands.GetUsersUpdateViewCommand;
 import org.moshe.arad.kafka.commands.LogInUserCommand;
+import org.moshe.arad.kafka.commands.LogOutUserCommand;
 import org.moshe.arad.kafka.events.GetUsersUpdateViewAckEvent;
 import org.moshe.arad.kafka.events.UserEmailAckEvent;
 import org.moshe.arad.kafka.events.UserNameAckEvent;
@@ -40,6 +42,9 @@ public class HomeService implements ApplicationContextAware {
 	private SimpleCommandsProducer<GetUsersUpdateViewCommand> getUsersUpdateViewCommandProducer;
 	
 	@Autowired
+	private SimpleCommandsProducer<LogOutUserCommand> logOutUserCommandProducer;
+	
+	@Autowired
 	private EventsPool eventsPool;	
 	
 	private ApplicationContext context;
@@ -61,7 +66,13 @@ public class HomeService implements ApplicationContextAware {
 	}
 	
 	public void findExistingUserAndLogout(UserCredentials userCredentials) {
-		BackgammonUser backgammonUser = new BackgammonUser(userCredentials.getUsername(), userCredentials.getPassword(), "", "", "", null);		
+		BackgammonUser backgammonUser = new BackgammonUser(userCredentials.getUsername(), userCredentials.getPassword(), "", "", "", null);
+		
+		LogOutUserCommand logOutUserCommand = context.getBean(LogOutUserCommand.class);
+		logOutUserCommand.setUser(backgammonUser);
+		
+		logOutUserCommandProducer.setTopic(KafkaUtils.LOG_OUT_USER_COMMAND_TOPIC);
+		logOutUserCommandProducer.sendKafkaMessage(logOutUserCommand);
 	}
 	
 	public boolean isUserNameAvailable(String userName){
@@ -192,6 +203,7 @@ public class HomeService implements ApplicationContextAware {
 		}
 
 		GetUsersUpdateViewAckEvent getUsersUpdateViewAckEvent = (GetUsersUpdateViewAckEvent) eventsPool.takeEventFromPoll(uuid);
+		if(getUsersUpdateViewAckEvent.getUsersViewChanges() == null) getUsersUpdateViewAckEvent.setUsersViewChanges(context.getBean(UsersViewChanges.class));
 		return getUsersUpdateViewAckEvent;
 	}	
 }
