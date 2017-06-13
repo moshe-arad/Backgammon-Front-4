@@ -9,6 +9,7 @@ import org.moshe.arad.kafka.commands.AddUserAsSecondPlayerCommand;
 import org.moshe.arad.kafka.commands.AddUserAsWatcherCommand;
 import org.moshe.arad.kafka.commands.GetAllGameRoomsCommand;
 import org.moshe.arad.kafka.commands.GetLobbyUpdateViewCommand;
+import org.moshe.arad.kafka.commands.LeaveGameRoomCommand;
 import org.moshe.arad.kafka.commands.OpenNewGameRoomCommand;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
@@ -36,6 +37,9 @@ public class LobbyService {
 	
 	@Autowired
 	private SimpleCommandsProducer<GetAllGameRoomsCommand> getAllGameRoomsCommandProducer;
+	
+	@Autowired
+	private SimpleCommandsProducer<LeaveGameRoomCommand> leaveGameRoomCommandProducer;
 	
 	@Autowired
 	private ApplicationContext context;
@@ -75,6 +79,17 @@ public class LobbyService {
 		
 		addUserAsSecondPlayerCommandProducer.setTopic(KafkaUtils.ADD_USER_AS_SECOND_PLAYER_COMMAND_TOPIC);
 		addUserAsSecondPlayerCommandProducer.sendKafkaMessage(addUserAsSecondPlayerCommand);
+	}
+	
+	public void leaveGameRoom(String userNameFromJson, String gameRoomNameFromJson) {
+		logger.info("Preparing a leave game room command...");
+		
+		LeaveGameRoomCommand leaveGameRoomCommand = context.getBean(LeaveGameRoomCommand.class);
+		leaveGameRoomCommand.setUsername(userNameFromJson);
+		leaveGameRoomCommand.setGameRoomName(gameRoomNameFromJson);
+		
+		leaveGameRoomCommandProducer.setTopic(KafkaUtils.LEAVE_GAME_ROOM_COMMAND_TOPIC);
+		leaveGameRoomCommandProducer.sendKafkaMessage(leaveGameRoomCommand);
 	}
 	
 	public void getAllGameRooms(String username) {
