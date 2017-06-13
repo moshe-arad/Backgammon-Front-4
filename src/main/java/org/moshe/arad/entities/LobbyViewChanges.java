@@ -19,6 +19,7 @@ public class LobbyViewChanges {
 	private Map<Object,Object> addWatchers = new HashMap<>(10000);
 	private Map<Object,Object> deleteWatchers = new HashMap<>(10000);
 	private Map<Object,Object> addSecondPlayer = new HashMap<>(10000);
+	private List<String> leavingPlayers =  new ArrayList<>(10000);
 	
 	public LobbyViewChanges() {
 	
@@ -87,5 +88,13 @@ public class LobbyViewChanges {
 
 	public void setGameRoomsUpdate(List<GameRoom> gameRoomsUpdate) {
 		this.gameRoomsUpdate = gameRoomsUpdate;
+	}
+
+	public List<String> getLeavingPlayers() {
+		return leavingPlayers;
+	}
+
+	public void setLeavingPlayers(List<String> leavingPlayers) {
+		this.leavingPlayers = leavingPlayers;
 	}
 }
