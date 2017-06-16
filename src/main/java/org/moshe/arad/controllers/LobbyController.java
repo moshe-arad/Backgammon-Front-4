@@ -78,6 +78,23 @@ public class LobbyController {
 		return new ResponseEntity<>(headers, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/room/leave", consumes = "application/json", method = RequestMethod.PUT, produces="application/json")
+	public ResponseEntity<?> leaveGameRoom(@RequestBody String body){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		ObjectMapper objectMapper = new ObjectMapper();
+		String userNameFromJson = null;
+		String gameRoomNameFromJson = null;
+		try {
+			userNameFromJson = objectMapper.readTree(body).path("username").asText();
+			gameRoomNameFromJson = objectMapper.readTree(body).path("gameRoomName").asText();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		lobbyService.leaveGameRoom(userNameFromJson, gameRoomNameFromJson);
+		return new ResponseEntity<>(headers, HttpStatus.OK);
+	}
+	
 	// #### To view Service ####
 	
 	@RequestMapping(value = "/room/all", consumes="application/json", method = RequestMethod.GET, produces = "application/json")
