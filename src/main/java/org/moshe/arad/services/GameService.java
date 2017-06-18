@@ -7,6 +7,7 @@ import org.moshe.arad.entities.LobbyViewChanges;
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.GetGameUpdateViewCommand;
+import org.moshe.arad.kafka.commands.RollDiceCommand;
 import org.moshe.arad.kafka.events.GetGameUpdateViewAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
 import org.moshe.arad.replies.GetLobbyUpdateViewReply;
@@ -23,6 +24,9 @@ public class GameService {
 	private SimpleCommandsProducer<GetGameUpdateViewCommand> getGameUpdateViewCommandProducer;
 	
 	@Autowired
+	private SimpleCommandsProducer<RollDiceCommand> rollDiceCommandProducer;
+	
+	@Autowired
 	private ApplicationContext context;
 	
 	@Autowired
@@ -31,6 +35,16 @@ public class GameService {
 	private Logger logger = LoggerFactory.getLogger(GameService.class);
 	
 	
+	public void rollDice(String username, String gameRoomName){
+		logger.info("Preparing a roll dice command...");
+		
+		RollDiceCommand rollDiceCommand = context.getBean(RollDiceCommand.class);
+		rollDiceCommand.setUsername(username);
+		rollDiceCommand.setGameRoomName(gameRoomName);
+		
+		rollDiceCommandProducer.setTopic(KafkaUtils.ROLL_DICE_COMMAND_TOPIC);
+		rollDiceCommandProducer.sendKafkaMessage(rollDiceCommand);
+	}
 	
 	public GameViewChanges getGameUpdateView(String all, String group, String user) {
 		logger.info("Preparing a get Lobby Update view command...");

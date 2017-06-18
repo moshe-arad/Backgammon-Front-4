@@ -1,11 +1,5 @@
 package org.moshe.arad.entities;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.moshe.arad.entities.GameRoom;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +9,10 @@ public class GameViewChanges {
 
 	private String messageToWhite;
 	private String messageToBlack;
+	private Boolean isToShowRollDiceBtnToWhite;
+	private Boolean isToShowRollDiceBtnToBlack;
+	private Boolean isWhiteTurn;
+	private Boolean isBlackTurn;
 	
 	public GameViewChanges() {
 	
@@ -45,5 +43,37 @@ public class GameViewChanges {
 
 	public void setMessageToBlack(String messageToBlack) {
 		this.messageToBlack = messageToBlack;
+	}
+
+	public Boolean getIsToShowRollDiceBtnToWhite() {
+		return isToShowRollDiceBtnToWhite;
+	}
+
+	public void setIsToShowRollDiceBtnToWhite(Boolean isToShowRollDiceBtnToWhite) {
+		this.isToShowRollDiceBtnToWhite = isToShowRollDiceBtnToWhite;
+	}
+
+	public Boolean getIsToShowRollDiceBtnToBlack() {
+		return isToShowRollDiceBtnToBlack;
+	}
+
+	public void setIsToShowRollDiceBtnToBlack(Boolean isToShowRollDiceBtnToBlack) {
+		this.isToShowRollDiceBtnToBlack = isToShowRollDiceBtnToBlack;
+	}
+
+	public Boolean getIsWhiteTurn() {
+		return isWhiteTurn;
+	}
+
+	public void setIsWhiteTurn(Boolean isWhiteTurn) {
+		this.isWhiteTurn = isWhiteTurn;
+	}
+
+	public Boolean getIsBlackTurn() {
+		return isBlackTurn;
+	}
+
+	public void setIsBlackTurn(Boolean isBlackTurn) {
+		this.isBlackTurn = isBlackTurn;
 	}
 }
