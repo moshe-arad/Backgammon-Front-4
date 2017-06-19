@@ -50,4 +50,9 @@ public class KafkaUtils {
 	public static final String GET_USERS_UPDATE_VIEW_ACK_EVENT_TOPIC = "Get-Users-Update-View-Ack-Event";
 	public static final String LOG_OUT_USER_COMMAND_TOPIC = "Log-Out-User-Command";
 	public static final String LEAVE_GAME_ROOM_COMMAND_TOPIC = "Leave-Game-Room-Command";
+	public static final String GET_GAME_UPDATE_VIEW_COMMAND_TOPIC = "Get-Game-Update-View-Command";
+	public static final String GET_GAME_UPDATE_VIEW_ACK_EVENT_GROUP = "GetGameUpdateViewAckEventGroup1";
+	public static final String GET_GAME_UPDATE_VIEW_ACK_EVENT_TOPIC = "Get-Game-Update-View-Ack-Event";
+	public static final String ROLL_DICE_COMMAND_TOPIC = "Roll-Dice-Command";
+	public static final String MAKE_MOVE_COMMAND_TOPIC = "Make-Move-Command";
 }
