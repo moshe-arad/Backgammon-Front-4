@@ -8,8 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.moshe.arad.kafka.events.BackgammonEvent;
-import org.moshe.arad.websocket.EmailMessage;
-import org.moshe.arad.websocket.UserNameMessage;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,13 +19,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class EventsPool {
 
-	private static final int POLL_SIZE = 100000;
+	private static final int POOL_SIZE = 100000;
 	private static final int SLEEP = 100;
-	private Set<BackgammonEvent> events = new HashSet<>(POLL_SIZE);
+	private Set<BackgammonEvent> events = new HashSet<>(POOL_SIZE);
 	
-	private Map<String, Thread> userNamesLockers = new HashMap<>(POLL_SIZE);
-	private Map<String, Thread> emailsLockers = new HashMap<>(POLL_SIZE);
-	private Map<String, Thread> createUserLockers = new HashMap<>(POLL_SIZE);
+	private Map<String, Thread> userNamesLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> emailsLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> createUserLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> openNewGameRoomLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> userWatcherLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> getRoomsLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> getLobbyUpdateViewLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> getUsersUpdateViewLockers = new HashMap<>(POOL_SIZE);
+	private Map<String, Thread> getGameUpdateViewLockers = new HashMap<>(POOL_SIZE);
 	
 	public boolean addEventToPool(BackgammonEvent event){
 		return events.add(event);
@@ -96,5 +100,53 @@ public class EventsPool {
 
 	public void setCreateUserLockers(Map<String, Thread> createUserLockers) {
 		this.createUserLockers = createUserLockers;
+	}
+
+	public Map<String, Thread> getOpenNewGameRoomLockers() {
+		return openNewGameRoomLockers;
+	}
+
+	public void setOpenNewGameRoomLockers(Map<String, Thread> openNewGameRoomLockers) {
+		this.openNewGameRoomLockers = openNewGameRoomLockers;
+	}
+
+	public Map<String, Thread> getUserWatcherLockers() {
+		return userWatcherLockers;
+	}
+
+	public void setUserWatcherLockers(Map<String, Thread> userWatcherLockers) {
+		this.userWatcherLockers = userWatcherLockers;
+	}
+
+	public Map<String, Thread> getGetRoomsLockers() {
+		return getRoomsLockers;
+	}
+
+	public void setGetRoomsLockers(Map<String, Thread> getRoomsLockers) {
+		this.getRoomsLockers = getRoomsLockers;
+	}
+
+	public Map<String, Thread> getGetUpdateViewLockers() {
+		return getLobbyUpdateViewLockers;
+	}
+
+	public void setGetUpdateViewLockers(Map<String, Thread> getUpdateViewLockers) {
+		this.getLobbyUpdateViewLockers = getUpdateViewLockers;
+	}
+
+	public Map<String, Thread> getGetUsersUpdateViewLockers() {
+		return getUsersUpdateViewLockers;
+	}
+
+	public void setGetUsersUpdateViewLockers(Map<String, Thread> getUsersUpdateViewLockers) {
+		this.getUsersUpdateViewLockers = getUsersUpdateViewLockers;
+	}
+
+	public Map<String, Thread> getGetGameUpdateViewLockers() {
+		return getGameUpdateViewLockers;
+	}
+
+	public void setGetGameUpdateViewLockers(Map<String, Thread> getGameUpdateViewLockers) {
+		this.getGameUpdateViewLockers = getGameUpdateViewLockers;
 	}
 }

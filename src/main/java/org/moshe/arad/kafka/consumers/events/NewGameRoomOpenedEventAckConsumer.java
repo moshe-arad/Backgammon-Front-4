@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
-import org.moshe.arad.kafka.events.NewUserCreatedAckEvent;
+import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.kafka.events.UserEmailAckEvent;
 import org.moshe.arad.services.HomeService;
 import org.slf4j.Logger;
@@ -17,37 +17,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 @Scope("prototype")
-public class NewUserCreatedAckEventConsumer extends SimpleEventsConsumer {
+public class NewGameRoomOpenedEventAckConsumer extends SimpleEventsConsumer implements ISimpleConsumer {
 
 	@Autowired
 	private HomeService homeService;
 	
-	private Logger logger = LoggerFactory.getLogger(NewUserCreatedAckEventConsumer.class);
+	private Logger logger = LoggerFactory.getLogger(NewGameRoomOpenedEventAckConsumer.class);
 	
-	public NewUserCreatedAckEventConsumer() {
-	
+	public NewGameRoomOpenedEventAckConsumer() {
 	}
-	
+
 	@Override
-	public void consumerOperations(ConsumerRecord<String, String> record) {
-		NewUserCreatedAckEvent newUserCreatedAckEvent = convertJsonBlobIntoEvent(record.value());
-		Object locker = homeService.getEventsPoll().getCreateUserLockers().get(newUserCreatedAckEvent.getUuid().toString());
+	public void consumerOperations(ConsumerRecord<String,String> record) {
+		NewGameRoomOpenedEventAck newGameRoomOpenedEventAck = convertJsonBlobIntoEvent(record.value());
+		Object locker = homeService.getEventsPoll().getOpenNewGameRoomLockers().get(newGameRoomOpenedEventAck.getUuid().toString());
 		
 		if(locker!= null){
 			synchronized (locker) {
-				logger.info("New User Created Ack Event record recieved, " + record.value());
+				logger.info("New Game Room Opened Event Ack record recieved, " + record.value());
 				logger.info("passing event to home service queue...");
-				homeService.getEventsPoll().addEventToPool(newUserCreatedAckEvent);
-				logger.info("New User Created Ack Event record passed to home service...");
+				homeService.getEventsPoll().addEventToPool(newGameRoomOpenedEventAck);
+				logger.info("New Game Room Opened Event Ack record passed to home service...");
 				locker.notifyAll();
 			}
-		}		
+		}
+						
 	}
 	
-	private NewUserCreatedAckEvent convertJsonBlobIntoEvent(String JsonBlob){
+	private NewGameRoomOpenedEventAck convertJsonBlobIntoEvent(String JsonBlob){
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			return objectMapper.readValue(JsonBlob, NewUserCreatedAckEvent.class);
+			return objectMapper.readValue(JsonBlob, NewGameRoomOpenedEventAck.class);
 		} catch (IOException e) {
 			logger.error("Falied to convert Json blob into Event...");
 			logger.error(e.getMessage());
@@ -55,5 +55,9 @@ public class NewUserCreatedAckEventConsumer extends SimpleEventsConsumer {
 		}
 		return null;
 	}
-
 }
+
+
+
+
+	
