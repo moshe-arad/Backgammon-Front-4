@@ -7,6 +7,7 @@ import org.moshe.arad.entities.LobbyViewChanges;
 import org.moshe.arad.kafka.EventsPool;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.commands.GetGameUpdateViewCommand;
+import org.moshe.arad.kafka.commands.MakeMoveCommand;
 import org.moshe.arad.kafka.commands.RollDiceCommand;
 import org.moshe.arad.kafka.events.GetGameUpdateViewAckEvent;
 import org.moshe.arad.kafka.producers.commands.SimpleCommandsProducer;
@@ -27,6 +28,9 @@ public class GameService {
 	private SimpleCommandsProducer<RollDiceCommand> rollDiceCommandProducer;
 	
 	@Autowired
+	private SimpleCommandsProducer<MakeMoveCommand> makeMoveCommandProducer;
+	
+	@Autowired
 	private ApplicationContext context;
 	
 	@Autowired
@@ -44,6 +48,19 @@ public class GameService {
 		
 		rollDiceCommandProducer.setTopic(KafkaUtils.ROLL_DICE_COMMAND_TOPIC);
 		rollDiceCommandProducer.sendKafkaMessage(rollDiceCommand);
+	}
+	
+	public void makeMove(String username, String gameRoomName, int fromColumn, int toColumn) {
+		logger.info("Preparing a make move command...");
+		
+		MakeMoveCommand makeMoveCommand = context.getBean(MakeMoveCommand.class);
+		makeMoveCommand.setUsername(username);
+		makeMoveCommand.setGameRoomName(gameRoomName);
+		makeMoveCommand.setFrom(fromColumn);
+		makeMoveCommand.setTo(toColumn);
+		
+		makeMoveCommandProducer.setTopic(KafkaUtils.MAKE_MOVE_COMMAND_TOPIC);
+		makeMoveCommandProducer.sendKafkaMessage(makeMoveCommand);
 	}
 	
 	public GameViewChanges getGameUpdateView(String all, String group, String user) {
@@ -92,5 +109,5 @@ public class GameService {
 		GameViewChanges gameViewChanges = getGameUpdateViewAckEvent.getGameViewChange();
 		if(gameViewChanges == null) gameViewChanges = context.getBean(GameViewChanges.class);
 		return gameViewChanges;
-	}
+	}	
 }

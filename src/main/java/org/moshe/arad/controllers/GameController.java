@@ -27,6 +27,28 @@ public class GameController {
 	@Autowired
 	private GameService gameService;
 	
+	@RequestMapping(value = "/move", consumes="application/json", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<?> makeMove(@RequestBody String body){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		ObjectMapper objectMapper = new ObjectMapper();
+		String userNameFromJson = null;
+		String gameRoomNameFromJson = null;
+		int fromColumnFromJson = -2;
+		int toColumnFromJson = -2;
+		
+		try {
+			userNameFromJson = objectMapper.readTree(body).path("username").asText();
+			gameRoomNameFromJson = objectMapper.readTree(body).path("gameRoomName").asText();
+			fromColumnFromJson = objectMapper.readTree(body).path("from").asInt();
+			toColumnFromJson = objectMapper.readTree(body).path("to").asInt();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		gameService.makeMove(userNameFromJson, gameRoomNameFromJson, fromColumnFromJson, toColumnFromJson);
+		return new ResponseEntity<>(headers, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/rollDice", consumes="application/json", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<?> rollDice(@RequestBody String body){
 		HttpHeaders headers = new HttpHeaders();
