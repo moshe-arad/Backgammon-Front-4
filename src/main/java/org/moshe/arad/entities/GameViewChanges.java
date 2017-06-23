@@ -13,6 +13,13 @@ public class GameViewChanges {
 	private Boolean isToShowRollDiceBtnToBlack;
 	private Boolean isWhiteTurn;
 	private Boolean isBlackTurn;
+	private Boolean isWhiteReturned;
+	private Boolean isBlackReturned;
+	private Boolean isWhiteTookOut;
+	private Boolean isBlackTookOut;
+	private Boolean isBlackAteWhite;
+	private Boolean isWhiteAteBlack;
+	private Boolean isToApplyMove;
 	
 	public GameViewChanges() {
 	
@@ -75,5 +82,61 @@ public class GameViewChanges {
 
 	public void setIsBlackTurn(Boolean isBlackTurn) {
 		this.isBlackTurn = isBlackTurn;
+	}
+
+	public Boolean getIsWhiteReturned() {
+		return isWhiteReturned;
+	}
+
+	public void setIsWhiteReturned(Boolean isWhiteReturned) {
+		this.isWhiteReturned = isWhiteReturned;
+	}
+
+	public Boolean getIsBlackReturned() {
+		return isBlackReturned;
+	}
+
+	public void setIsBlackReturned(Boolean isBlackReturned) {
+		this.isBlackReturned = isBlackReturned;
+	}
+
+	public Boolean getIsWhiteTookOut() {
+		return isWhiteTookOut;
+	}
+
+	public void setIsWhiteTookOut(Boolean isWhiteTookOut) {
+		this.isWhiteTookOut = isWhiteTookOut;
+	}
+
+	public Boolean getIsBlackTookOut() {
+		return isBlackTookOut;
+	}
+
+	public void setIsBlackTookOut(Boolean isBlackTookOut) {
+		this.isBlackTookOut = isBlackTookOut;
+	}
+
+	public Boolean getIsBlackAteWhite() {
+		return isBlackAteWhite;
+	}
+
+	public void setIsBlackAteWhite(Boolean isBlackAteWhite) {
+		this.isBlackAteWhite = isBlackAteWhite;
+	}
+
+	public Boolean getIsWhiteAteBlack() {
+		return isWhiteAteBlack;
+	}
+
+	public void setIsWhiteAteBlack(Boolean isWhiteAteBlack) {
+		this.isWhiteAteBlack = isWhiteAteBlack;
+	}
+
+	public Boolean getIsToApplyMove() {
+		return isToApplyMove;
+	}
+
+	public void setIsToApplyMove(Boolean isToApplyMove) {
+		this.isToApplyMove = isToApplyMove;
 	}
 }
