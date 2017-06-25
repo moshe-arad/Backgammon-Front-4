@@ -20,6 +20,10 @@ public class GameViewChanges {
 	private Boolean isBlackAteWhite;
 	private Boolean isWhiteAteBlack;
 	private Boolean isToApplyMove;
+	private int from;
+	private int to;
+	private int columnSizeOnFrom;
+	private int columnSizeOnTo;
 	
 	public GameViewChanges() {
 	
@@ -138,5 +142,37 @@ public class GameViewChanges {
 
 	public void setIsToApplyMove(Boolean isToApplyMove) {
 		this.isToApplyMove = isToApplyMove;
+	}
+
+	public int getFrom() {
+		return from;
+	}
+
+	public void setFrom(int from) {
+		this.from = from;
+	}
+
+	public int getTo() {
+		return to;
+	}
+
+	public void setTo(int to) {
+		this.to = to;
+	}
+
+	public int getColumnSizeOnFrom() {
+		return columnSizeOnFrom;
+	}
+
+	public void setColumnSizeOnFrom(int columnSizeOnFrom) {
+		this.columnSizeOnFrom = columnSizeOnFrom;
+	}
+
+	public int getColumnSizeOnTo() {
+		return columnSizeOnTo;
+	}
+
+	public void setColumnSizeOnTo(int columnSizeOnTo) {
+		this.columnSizeOnTo = columnSizeOnTo;
 	}
 }
