@@ -9,6 +9,7 @@ public class GameViewChanges {
 
 	private String messageToWhite;
 	private String messageToBlack;
+	private String messageToWatcher;
 	private Boolean isToShowRollDiceBtnToWhite;
 	private Boolean isToShowRollDiceBtnToBlack;
 	private Boolean isWhiteTurn;
@@ -174,5 +175,13 @@ public class GameViewChanges {
 
 	public void setColumnSizeOnTo(int columnSizeOnTo) {
 		this.columnSizeOnTo = columnSizeOnTo;
+	}
+
+	public String getMessageToWatcher() {
+		return messageToWatcher;
+	}
+
+	public void setMessageToWatcher(String messageToWatcher) {
+		this.messageToWatcher = messageToWatcher;
 	}
 }
